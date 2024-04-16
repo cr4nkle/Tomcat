@@ -9,7 +9,7 @@ import static program.logic.Optimator.*;
 public class Main {
     public static void main(String[] args) {
         try {
-//            PostgresHelper postgresHelper = new PostgresHelper();
+//            PostgresSecondHelper postgresHelper = new PostgresSecondHelper();
 //            postgresHelper.readFromDb();
 //            try (var greeter = new Neo4jHelper("bolt://localhost:7687", "neo4j", "rootroot")) {
 //                greeter.write();

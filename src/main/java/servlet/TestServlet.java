@@ -1,7 +1,7 @@
 package servlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import program.database.PostgresHelper;
+import program.database.PostgresSecondHelper;
 import program.model.metainfo.Line;
 
 import javax.servlet.ServletException;
@@ -17,8 +17,8 @@ public class TestServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         PrintWriter printWriter = resp.getWriter();
 
-        PostgresHelper postgresHelper = PostgresHelper.getInstance();
-        ArrayList<Line> list = postgresHelper.readLines();
+        PostgresSecondHelper postgresSecondHelper = PostgresSecondHelper.getInstance();
+        ArrayList<Line> list = postgresSecondHelper.readLines();
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonString = null;
         try {

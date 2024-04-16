@@ -7,34 +7,30 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import program.model.ModelName;
 import program.model.graph.*;
-import program.model.metainfo.Consumer;
-import program.model.metainfo.Line;
-import program.model.metainfo.Source;
+import program.utils.Constant;
+
 import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 
-public class PostgresHelper {
-    private static final String URL = "jdbc:postgresql://localhost:5432/metaInfo";
-    private static final String USER = "postgres";
-    private static final String PASSWORD = "root";
+public class PostgresFirstHandler {
     private Connection connection;
-    private static volatile PostgresHelper INSTANCE;
+    private static volatile PostgresFirstHandler INSTANCE;
 
-    private PostgresHelper(){
+    private PostgresFirstHandler(){
         try {
-            this.connection = DriverManager.getConnection(URL, USER, PASSWORD);
+            this.connection = DriverManager.getConnection(
+                    Constant.FIRST_CLIENT_URL, Constant.FIRST_CLIENT_USER, Constant.FIRST_CLIENT_PASSWORD);
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
             throw new RuntimeException("Failed to establish database connection", e);
         }
     }
 
-    public static PostgresHelper getInstance() {
+    public static PostgresFirstHandler getInstance() {
         if (INSTANCE == null) {
-            synchronized (PostgresHelper.class) {
+            synchronized (PostgresFirstHandler.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new PostgresHelper();
+                    INSTANCE = new PostgresFirstHandler();
                 }
             }
         }
@@ -47,73 +43,6 @@ public class PostgresHelper {
         }
     }
 
-    public ArrayList<Line> readLines() {
-        ArrayList<Line> list = new ArrayList<>();
-
-        try(Statement st = connection.createStatement();
-            ResultSet rs = st.executeQuery("SELECT * FROM Lines;")){
-
-            while (rs.next()) {
-                list.add(new Line(
-                        rs.getInt("ID"),
-                        rs.getString("type"),
-                        rs.getString("name"),
-                        rs.getInt("throughput"),
-                        rs.getInt("resistance"),
-                        rs.getFloat("cost")
-                ));
-            }
-
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-        return list;
-    }
-
-    public ArrayList<Source> readSources() {
-        ArrayList<Source> list = new ArrayList<>();
-        try (Statement st = connection.createStatement();
-            ResultSet rs = st.executeQuery("SELECT * FROM Sources;")) {
-
-            while (rs.next()) {
-                list.add(new Source(
-                        rs.getInt("ID"),
-                        rs.getString("type"),
-                        rs.getString("name"),
-                        rs.getInt("max_gen"),
-                        rs.getInt("min_gen"),
-                        rs.getFloat("price"),
-                        rs.getFloat("cost")
-                ));
-            }
-
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-        return list;
-    }
-
-    public ArrayList<Consumer> readConsumers() {
-        ArrayList<Consumer> list = new ArrayList<>();
-        try (Statement st = connection.createStatement();
-            ResultSet rs = st.executeQuery("SELECT * FROM Consumers;")) {
-
-            while (rs.next()) {
-                list.add(new Consumer(
-                        rs.getInt("ID"),
-                        rs.getString("type"),
-                        rs.getString("name"),
-                        rs.getInt("load")
-                ));
-            }
-
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-        return list;
-    }
-
-    //убрать в другой класс
     public boolean insertModel(Graph graph) {
         boolean isInserted = false;
         ObjectMapper objectMapper = new ObjectMapper();
@@ -209,7 +138,7 @@ public class PostgresHelper {
     public ModelName readModelNames () {
         ModelName modelName = new ModelName();
         try (Statement st = connection.createStatement();
-            ResultSet rs = st.executeQuery("SELECT name FROM model m")) {
+             ResultSet rs = st.executeQuery("SELECT name FROM model m")) {
             while (rs.next()){
                 modelName.addModelName(rs.getString("name"));
             }

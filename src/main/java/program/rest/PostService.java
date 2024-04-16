@@ -4,7 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import program.database.PostgresHelper;
+import program.database.PostgresFirstHandler;
+import program.database.PostgresSecondHelper;
 import program.logic.calculate.EdgeSolution;
 import program.logic.calculate.NodeSolution;
 import program.model.graph.Graph;
@@ -22,8 +23,8 @@ public class PostService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response saveModel(Graph graph) {
-        PostgresHelper postgresHelper = PostgresHelper.getInstance();
-        boolean isInserted = postgresHelper.insertModel(graph);
+        PostgresFirstHandler postgresFirstHandler = PostgresFirstHandler.getInstance();
+        boolean isInserted = postgresFirstHandler.insertModel(graph);
         System.out.println(isInserted);
         if (!isInserted) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();

@@ -35,6 +35,7 @@ var addEdgeOn,
   addNodeOn,
   editModeOn,
   delModeOn = false;
+var modelName;
 
 var dropdown = document.getElementById("test");
 
@@ -48,6 +49,11 @@ function populateDropdown(data) {
   }
 }
 
+dropdown.addEventListener("change", function (event) {
+  var selectedValue = event.target.value;
+  console.log("Выбранное значение:", selectedValue);
+});
+
 fetch("http://localhost:8080/app/api/get/lines")
   .then((res) => res.json())
   .then((data) => {
@@ -57,6 +63,8 @@ fetch("http://localhost:8080/app/api/get/lines")
 // Обработка события при открытии файла
 inputElement.addEventListener("change", function (e) {
   var file = e.target.files[0];
+  modelName = file.name;
+  console.log(modelNamel);
   var url = URL.createObjectURL(file);
   setModeValue(false, false, false, false);
   start(new Request(url));
@@ -64,9 +72,9 @@ inputElement.addEventListener("change", function (e) {
 
 openBtn.addEventListener("click", () => {
   console.log("open");
-   let url = "http://localhost:8080/app/api/get/model?name=graph2";
-   setModeValue(false, false, false, false);
-   start(new Request(url));
+  let url = `http://localhost:8080/app/api/get/test?name=NodeEx.json`;
+  setModeValue(false, false, false, false);
+  start(new Request(url));
 });
 
 // Подумать, как можно переделать чтобы только один раз грузить стиль, а остальные разы перезагружать данные графа
@@ -196,7 +204,7 @@ function start(request) {
 
     exportBtn.addEventListener("click", () => {
       var graphJSON = cy.json();
-
+      graphJSON.name = modelName;
       // var graphJSONString = JSON.stringify(graphJSON);
       // // console.log(graphJSONString);
       // var blob = new Blob([graphJSONString], { type: "application/json" });
@@ -208,7 +216,7 @@ function start(request) {
       // link.click();
 
       let xhr = new XMLHttpRequest();
-      let url = "http://localhost:8080/app/api/post/saveModel";
+      let url = "http://localhost:8080/app/api/post/test/saveModel";
 
       xhr.open("POST", url, true);
       xhr.setRequestHeader("Content-Type", "application/json");

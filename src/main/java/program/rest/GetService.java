@@ -4,12 +4,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import program.database.PostgresFirstHandler;
-import program.database.PostgresSecondHelper;
-import program.model.ModelName;
-import program.model.graph.Graph;
-import program.model.metainfo.Consumer;
-import program.model.metainfo.Line;
-import program.model.metainfo.Source;
+import program.database.PostgresSecondHandler;
+import program.database.PostgresThirdHandler;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -17,7 +13,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
 import java.util.function.Supplier;
 
 @Path("/get")
@@ -33,21 +28,21 @@ public class GetService {
     @Path("/sources")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getSources() {
-        return getData(PostgresSecondHelper.getInstance()::readSources);
+        return getData(PostgresSecondHandler.getInstance()::readSources);
     }
 
     @GET
     @Path("/consumers")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getConsumers() {
-        return getData(PostgresSecondHelper.getInstance()::readConsumers);
+        return getData(PostgresSecondHandler.getInstance()::readConsumers);
     }
 
     @GET
     @Path("/lines")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getLines() {
-        return getData(PostgresSecondHelper.getInstance()::readLines);
+        return getData(PostgresSecondHandler.getInstance()::readLines);
     }
 
     @GET
@@ -55,6 +50,13 @@ public class GetService {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getModel(@QueryParam("name") String name) {
         return getData(() -> PostgresFirstHandler.getInstance().readModelByName(name));
+    }
+
+    @GET
+    @Path("/test")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getTest(@QueryParam("name") String name) {
+        return getData(() -> PostgresThirdHandler.getInstance().readModelByName(name));
     }
 
     private <T> Response getData(Supplier<T> dataSupplier) {

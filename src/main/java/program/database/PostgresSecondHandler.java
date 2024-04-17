@@ -8,11 +8,11 @@ import program.utils.Constant;
 import java.sql.*;
 import java.util.ArrayList;
 
-public class PostgresSecondHelper {
+public class PostgresSecondHandler {
     private Connection connection;
-    private static volatile PostgresSecondHelper INSTANCE;
+    private static volatile PostgresSecondHandler INSTANCE;
 
-    private PostgresSecondHelper(){
+    private PostgresSecondHandler(){
         try {
             this.connection = DriverManager.getConnection(
                     Constant.SECOND_CLIENT_URL, Constant.SECOND_CLIENT_USER, Constant.SECOND_CLIENT_PASSWORD);
@@ -22,11 +22,11 @@ public class PostgresSecondHelper {
         }
     }
 
-    public static PostgresSecondHelper getInstance() {
+    public static PostgresSecondHandler getInstance() {
         if (INSTANCE == null) {
-            synchronized (PostgresSecondHelper.class) {
+            synchronized (PostgresSecondHandler.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new PostgresSecondHelper();
+                    INSTANCE = new PostgresSecondHandler();
                 }
             }
         }

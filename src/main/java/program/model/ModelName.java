@@ -1,11 +1,12 @@
 package program.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonRootName;
+import com.fasterxml.jackson.annotation.*;
 
 import java.util.ArrayList;
 
 @JsonRootName("models")
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ModelName {
     @JsonProperty("name")
     private ArrayList<String> modelName;
@@ -14,6 +15,7 @@ public class ModelName {
         this.modelName = new ArrayList<>();
     }
 
+    @JsonCreator
     public ModelName (@JsonProperty("name") ArrayList<String> modelName) {
         this.modelName = modelName;
     }

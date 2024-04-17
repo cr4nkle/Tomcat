@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import program.database.PostgresFirstHandler;
-import program.database.PostgresSecondHelper;
+import program.database.PostgresThirdHandler;
 import program.logic.calculate.EdgeSolution;
 import program.logic.calculate.NodeSolution;
 import program.model.graph.Graph;
@@ -26,9 +26,19 @@ public class PostService {
         PostgresFirstHandler postgresFirstHandler = PostgresFirstHandler.getInstance();
         boolean isInserted = postgresFirstHandler.insertModel(graph);
         System.out.println(isInserted);
-        if (!isInserted) {
+        if (!isInserted) {//тут всегда false почему-то
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
+
+        return Response.status(Response.Status.OK).build();
+    }
+    @POST
+    @Path("/test/saveModel")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response testSaveModel(Graph graph) {
+        PostgresThirdHandler postgresThirdHandler = PostgresThirdHandler.getInstance();
+        postgresThirdHandler.insertModel(graph);
 
         return Response.status(Response.Status.OK).build();
     }

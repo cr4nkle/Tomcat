@@ -1,13 +1,12 @@
 package program.model.graph;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StyleRule {
+    @JsonIgnore
+    private int idFromDB;
     @JsonProperty("selector")
     private String selector;
     @JsonProperty("style")
@@ -16,8 +15,10 @@ public class StyleRule {
     public StyleRule () {}
 
     @JsonCreator
-    public StyleRule (@JsonProperty("selector") String selector,
+    public StyleRule (int idFromDB,
+                      @JsonProperty("selector") String selector,
                       @JsonProperty("style") Style style) {
+        this.idFromDB = idFromDB;
         this.selector = selector;
         this.style = style;
     }
@@ -36,5 +37,13 @@ public class StyleRule {
 
     public void setSelector(String selector) {
         this.selector = selector;
+    }
+
+    public int getIdFromDB() {
+        return idFromDB;
+    }
+
+    public void setIdFromDB(int idFromDB) {
+        this.idFromDB = idFromDB;
     }
 }

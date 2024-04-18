@@ -1,13 +1,12 @@
 package program.model.graph;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Node {
+    @JsonIgnore
+    private int idFromDB;
     private Data data;
     private Position position;
     private String group;
@@ -22,16 +21,18 @@ public class Node {
     public Node () {}
 
     @JsonCreator
-    public Node (@JsonProperty("data") Data data,
-                 @JsonProperty("position") Position position,
-                 @JsonProperty("group") String group,
-                 @JsonProperty("removed") boolean removed,
-                 @JsonProperty("selected") boolean selected,
-                 @JsonProperty("selectable") boolean selectable,
-                 @JsonProperty("locked") boolean locked,
-                 @JsonProperty("grabbable") boolean grabbable,
-                 @JsonProperty("pannable") boolean pannable,
-                 @JsonProperty("classes") String classes) {
+    public Node (int idFromDB,
+            @JsonProperty("data") Data data,
+            @JsonProperty("position") Position position,
+            @JsonProperty("group") String group,
+            @JsonProperty("removed") boolean removed,
+            @JsonProperty("selected") boolean selected,
+            @JsonProperty("selectable") boolean selectable,
+            @JsonProperty("locked") boolean locked,
+            @JsonProperty("grabbable") boolean grabbable,
+            @JsonProperty("pannable") boolean pannable,
+            @JsonProperty("classes") String classes) {
+        this.idFromDB = idFromDB;
         this.data = data;
         this.classes = classes;
         this.position = position;
@@ -122,5 +123,13 @@ public class Node {
 
     public void setSelected(boolean selected) {
         this.selected = selected;
+    }
+
+    public int getIdFromDB() {
+        return idFromDB;
+    }
+
+    public void setIdFromDB(int idFromDB) {
+        this.idFromDB = idFromDB;
     }
 }

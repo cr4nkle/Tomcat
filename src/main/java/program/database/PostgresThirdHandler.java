@@ -299,6 +299,7 @@ public class PostgresThirdHandler {
                         equipments
                 );
                 nodes.add(new Node(
+                        rs.getInt("id"),
                         data,
                         position,
                         rs.getString("group"),
@@ -342,6 +343,7 @@ public class PostgresThirdHandler {
                         equipments
                 );
                 edges.add(new Edge(
+                        rs.getInt("id"),
                         data,
                         position,
                         rs.getString("group"),
@@ -371,6 +373,7 @@ public class PostgresThirdHandler {
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
                 equipments.add(new Equipment(
+                        rs.getInt("id"),
                         rs.getString("name"),
                         rs.getFloat("price"),
                         rs.getInt("throughput"),
@@ -396,6 +399,7 @@ public class PostgresThirdHandler {
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
                 equipments.add(new Equipment(
+                        rs.getInt("id"),
                         rs.getString("name"),
                         rs.getFloat("price"),
                         rs.getInt("throughput"),
@@ -424,6 +428,7 @@ public class PostgresThirdHandler {
             while (rs.next()) {
                 Style style = objectMapper.readValue(rs.getString("style"), Style.class);
                 styleRules.add(new StyleRule(
+                        rs.getInt("id"),
                         rs.getString("selector"),
                         style
                 ));

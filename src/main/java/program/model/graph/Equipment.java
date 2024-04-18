@@ -1,13 +1,12 @@
 package program.model.graph;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Equipment {
+    @JsonIgnore
+    private int idFromDB;
     @JsonProperty("name")
     private String name;
     @JsonProperty("price")
@@ -28,14 +27,15 @@ public class Equipment {
     public Equipment () {}
 
     @JsonCreator
-    public Equipment (@JsonProperty("name") String name,
-                      @JsonProperty("price") float price,
-                      @JsonProperty("throughput") int throughput,
-                      @JsonProperty("resistance") int resistance,
-                      @JsonProperty("cost") int cost,
-                      @JsonProperty("max_gen") int maxGen,
-                      @JsonProperty("min_gen") int minGen,
-                      @JsonProperty("load") int load) {
+    public Equipment (int idFromDB,
+            @JsonProperty("name") String name,
+            @JsonProperty("price") float price,
+            @JsonProperty("throughput") int throughput,
+            @JsonProperty("resistance") int resistance,
+            @JsonProperty("cost") int cost,
+            @JsonProperty("max_gen") int maxGen,
+            @JsonProperty("min_gen") int minGen,
+            @JsonProperty("load") int load) {
         this.name = name;
         this.price = price;
         this.cost = cost;
@@ -108,5 +108,13 @@ public class Equipment {
 
     public int getLoad() {
         return load;
+    }
+
+    public int getIdFromDB() {
+        return idFromDB;
+    }
+
+    public void setIdFromDB(int idFromDB) {
+        this.idFromDB = idFromDB;
     }
 }

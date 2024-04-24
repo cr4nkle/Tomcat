@@ -10,8 +10,8 @@ import java.util.ArrayList;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Graph {
-    @JsonProperty("name")
-    private String name;
+//    @JsonProperty("name")
+//    private String name;
     @JsonProperty("elements")
     private Element element;
     @JsonProperty("style")
@@ -42,7 +42,7 @@ public class Graph {
     public Graph () {}
 
     @JsonCreator
-    public Graph (@JsonProperty("name") String name,
+    public Graph (//@JsonProperty("name") String name,
             @JsonProperty("elements") Element element,
             @JsonProperty("style") ArrayList<StyleRule> styleRules,
             @JsonProperty("boxSelectionEnabled") boolean boxSelectionEnabled,
@@ -56,7 +56,7 @@ public class Graph {
             @JsonProperty("data") Data data,
             @JsonProperty("renderer") Renderer renderer,
             @JsonProperty("pan") Position position) {
-        this.name = name;
+//        this.name = name;
         this.element = element;
         this.styleRules = styleRules;
         this.maxZoom = maxZoom;
@@ -72,13 +72,13 @@ public class Graph {
         this.position = position;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
+//    public String getName() {
+//        return name;
+//    }
+//
+//    public void setName(String name) {
+//        this.name = name;
+//    }
 
     public Element getElement() {
         return element;

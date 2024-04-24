@@ -21,7 +21,7 @@ public class Node {
     public Node () {}
 
     @JsonCreator
-    public Node (int idFromDB,
+    public Node (
             @JsonProperty("data") Data data,
             @JsonProperty("position") Position position,
             @JsonProperty("group") String group,
@@ -32,7 +32,7 @@ public class Node {
             @JsonProperty("grabbable") boolean grabbable,
             @JsonProperty("pannable") boolean pannable,
             @JsonProperty("classes") String classes) {
-        this.idFromDB = idFromDB;
+//        this.idFromDB = idFromDB;
         this.data = data;
         this.classes = classes;
         this.position = position;

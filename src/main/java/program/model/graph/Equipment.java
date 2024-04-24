@@ -27,7 +27,7 @@ public class Equipment {
     public Equipment () {}
 
     @JsonCreator
-    public Equipment (int idFromDB,
+    public Equipment (
             @JsonProperty("name") String name,
             @JsonProperty("price") float price,
             @JsonProperty("throughput") int throughput,

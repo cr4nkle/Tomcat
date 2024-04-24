@@ -1,8 +1,6 @@
 package program.database;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import program.model.ModelName;
 import program.model.graph.*;
@@ -11,7 +9,6 @@ import program.utils.Constant;
 import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class PostgresThirdHandler {
     private Connection connection;
@@ -57,7 +54,7 @@ public class PostgresThirdHandler {
             pan = objectMapper.writeValueAsString(graph.getPosition());
             renderer = objectMapper.writeValueAsString(graph.getRenderer());
 
-            st.setString(1, graph.getName());
+//            st.setString(1, graph.getName());
             st.setString(2, "{}");
             st.setBoolean(3, graph.isZoomingEnabled());
             st.setBoolean(4, graph.isUserZoomingEnabled());
@@ -71,20 +68,20 @@ public class PostgresThirdHandler {
             st.setString(12, renderer);
             st.executeUpdate();
 
-            ArrayList<StyleRule> styleRules = graph.getStyleRules();
-            styleRules.forEach(styleRule -> {
-                insertStyleRule(graph.getName(), styleRule);
-            });
-
-            ArrayList<Node> nodes = graph.getElement().getNodes();
-            nodes.forEach(node -> {
-                insertNode(graph.getName(), node);
-            });
-
-            ArrayList<Edge> edges = graph.getElement().getEdges();
-            edges.forEach(edge -> {
-                insertEdge(graph.getName(), edge);
-            });
+//            ArrayList<StyleRule> styleRules = graph.getStyleRules();
+//            styleRules.forEach(styleRule -> {
+//                insertStyleRule(graph.getName(), styleRule);
+//            });
+//
+//            ArrayList<Node> nodes = graph.getElement().getNodes();
+//            nodes.forEach(node -> {
+//                insertNode(graph.getName(), node);
+//            });
+//
+//            ArrayList<Edge> edges = graph.getElement().getEdges();
+//            edges.forEach(edge -> {
+//                insertEdge(graph.getName(), edge);
+//            });
 
         } catch (SQLException | JsonProcessingException e) {
             e.printStackTrace();
@@ -198,10 +195,10 @@ public class PostgresThirdHandler {
             st.setInt(6, equipment.getThroughput());
             st.setInt(7, equipment.getResistance());
             st.setInt(8, equipment.getLoad());
-            if (isNode){
+            if (isNode) {
                 st.setInt(9, generatedKey);
                 st.setNull(10, Types.INTEGER);
-            }else{
+            } else {
                 st.setNull(9, Types.INTEGER);
                 st.setInt(10, generatedKey);
             }
@@ -252,7 +249,7 @@ public class PostgresThirdHandler {
                 renderer = objectMapper.readValue(rs.getString("renderer"), Renderer.class);
                 pan = objectMapper.readValue(rs.getString("pan"), Position.class);
                 graph = new Graph(
-                        rs.getString("name"),
+//                        rs.getString("name"),
                         element,
                         styleRules,
                         rs.getBoolean("boxSelectionEnabled"),
@@ -299,7 +296,7 @@ public class PostgresThirdHandler {
                         equipments
                 );
                 nodes.add(new Node(
-                        rs.getInt("id"),
+//                        rs.getInt("id"),
                         data,
                         position,
                         rs.getString("group"),
@@ -343,7 +340,7 @@ public class PostgresThirdHandler {
                         equipments
                 );
                 edges.add(new Edge(
-                        rs.getInt("id"),
+//                        rs.getInt("id"),
                         data,
                         position,
                         rs.getString("group"),
@@ -373,7 +370,7 @@ public class PostgresThirdHandler {
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
                 equipments.add(new Equipment(
-                        rs.getInt("id"),
+//                        rs.getInt("id"),
                         rs.getString("name"),
                         rs.getFloat("price"),
                         rs.getInt("throughput"),
@@ -399,7 +396,7 @@ public class PostgresThirdHandler {
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
                 equipments.add(new Equipment(
-                        rs.getInt("id"),
+//                        rs.getInt("id"),
                         rs.getString("name"),
                         rs.getFloat("price"),
                         rs.getInt("throughput"),
@@ -428,7 +425,7 @@ public class PostgresThirdHandler {
             while (rs.next()) {
                 Style style = objectMapper.readValue(rs.getString("style"), Style.class);
                 styleRules.add(new StyleRule(
-                        rs.getInt("id"),
+//                        rs.getInt("id"),
                         rs.getString("selector"),
                         style
                 ));
@@ -454,5 +451,156 @@ public class PostgresThirdHandler {
         }
 
         return modelName;
+    }
+
+    public void updateModel(Graph graph) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            PreparedStatement st = connection.prepareStatement("UPDATE model SET data=?, zoomingenabled=?," +
+                    " userzoomingenabled=?, zoom=?, minzoom=?, maxzoom=?, panningenabled=?, userpanningenabled=?, pan=?," +
+                    " boxselectionenabled=?, renderer=? WHERE name=?;");
+            String data = objectMapper.writeValueAsString(graph.getData());
+            String pan = objectMapper.writeValueAsString(graph.getPosition());
+            String renderer = objectMapper.writeValueAsString(graph.getRenderer());
+
+            st.setString(1, data);
+            st.setBoolean(2, graph.isZoomingEnabled());
+            st.setBoolean(3, graph.isUserZoomingEnabled());
+            st.setDouble(4, graph.getZoom());
+            st.setDouble(5, graph.getMinZoom());
+            st.setDouble(6, graph.getMaxZoom());
+            st.setBoolean(7, graph.isPanningEnabled());
+            st.setBoolean(8, graph.isUserPanningEnabled());
+            st.setString(9, pan);
+            st.setBoolean(10, graph.isBoxSelectionEnabled());
+            st.setString(11, renderer);
+//            st.setString(12, graph.getName());
+            st.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void updateNode(Node node) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            PreparedStatement st = connection.prepareStatement("UPDATE nodes SET viz_id=?, model_name=?," +
+                    " nodetype=?, systemtype=?, position=?, group=?, removed=?, selected=?, selectable=?," +
+                    " locked=?, grabbable=?, pannable=?, classes=? WHERE id=?;");
+            String position = objectMapper.writeValueAsString(node.getPosition());
+
+            //нужно перепроверить
+            st.setString(1, node.getData().getId());
+            st.setString(2, "");
+            st.setString(2, node.getData().getNodeType());
+            st.setString(3, node.getData().getSystemType());
+            st.setString(4, position);
+            st.setString(5, node.getGroup());
+            st.setBoolean(6, node.isRemoved());
+            st.setBoolean(8, node.isSelected());
+            st.setBoolean(9, node.isSelectable());
+            st.setBoolean(10, node.isLocked());
+            st.setBoolean(11, node.isGrabbable());
+            st.setBoolean(12, node.isPannable());
+            st.setString(13, node.getClasses());
+            st.setInt(14, node.getIdFromDB());
+            st.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void updateEdge(Edge edge) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            PreparedStatement st = connection.prepareStatement("UPDATE edges SET viz_id=?, model_name=?, source=?," +
+                    " target=?, systemtype=?, length=?, position=?, group=?, removed=?, selected=?," +
+                    " selectable=?, locked=?, grabbable=?, pannable=?, classes=? WHERE id=?;");
+            String position = objectMapper.writeValueAsString(edge.getPosition());
+
+            //нужно перепроверить
+            st.setString(1, edge.getData().getId());
+            st.setString(2, edge.getData().getSource());
+            st.setString(3, edge.getData().getTarget());
+            st.setString(4, edge.getData().getSystemType());
+            st.setInt(5, edge.getData().getLength());
+            st.setString(6, position);
+            st.setString(7, edge.getGroup());
+            st.setBoolean(8, edge.isRemoved());
+            st.setBoolean(9, edge.isSelected());
+            st.setBoolean(10, edge.isSelectable());
+            st.setBoolean(11, edge.isLocked());
+            st.setBoolean(12, edge.isGrabbable());
+            st.setBoolean(13, edge.isPannable());
+            st.setString(14, edge.getClasses());
+            st.setInt(15, edge.getIdFromDB());
+            st.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void updateEquipment(Equipment equipment) {
+        //нужно отдавать id узла и ребра либо также через null
+        try {
+            PreparedStatement st = connection.prepareStatement("UPDATE equipment SET name=?, max_gen=?, min_gen=?," +
+                    " price=?, cost=?, throughput=?, resistance=?, load=?, node_id=?, edge_id=? WHERE id=?;");
+            st.setString(1, equipment.getName());
+            st.setInt(2, equipment.getMaxGen());
+            st.setInt(3, equipment.getMinGen());
+            st.setFloat(4, equipment.getPrice());
+            st.setFloat(5, equipment.getCost());
+            st.setInt(6, equipment.getThroughput());
+            st.setInt(7, equipment.getResistance());
+            st.setInt(8, equipment.getLoad());
+            st.setInt(9, 1);
+            st.setInt(10, 1);
+            st.setInt(11, equipment.getIdFromDB());
+            st.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void deleteModel(String name){
+        try {
+            PreparedStatement st = connection.prepareStatement("");
+            st.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void deleteNode(int id){
+        try {
+            PreparedStatement st = connection.prepareStatement("");
+            st.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void deleteEdge(Edge edge){
+        try {
+            PreparedStatement st = connection.prepareStatement("");
+            st.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void deleteEquipment(int id){
+        try {
+            PreparedStatement st = connection.prepareStatement("");
+            st.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

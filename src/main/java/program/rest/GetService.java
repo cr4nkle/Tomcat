@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import program.database.PostgresFirstHandler;
 import program.database.PostgresSecondHandler;
 import program.database.PostgresThirdHandler;
+import program.utils.Constant;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -13,6 +14,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.function.Supplier;
 
 @Path("/get")
@@ -59,17 +64,40 @@ public class GetService {
         return getData(() -> PostgresThirdHandler.getInstance().readModelByName(name));
     }
 
+    @GET
+    @Path("/style")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getStyle() {
+        String jsonString = null;
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(Constant.PATH));
+            StringBuilder content = new StringBuilder();
+            String line = reader.readLine();
+            while (line != null) {
+                content.append(line).append(System.lineSeparator());
+                line = reader.readLine();
+            }
+            reader.close();
+            jsonString = content.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+
+        return Response.ok(jsonString).build();
+    }
+
     private <T> Response getData(Supplier<T> dataSupplier) {
         T data = dataSupplier.get();
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-        String jsonString = null;
-
+        String jsonString;
         try {
             jsonString = objectMapper.writeValueAsString(data);
         } catch (Exception e) {
             e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
 
         return Response.ok(jsonString).build();

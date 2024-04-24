@@ -107,7 +107,7 @@ public class PostgresFirstHandler {
                     renderer = objectMapper.readValue(rs.getString("renderer"), Renderer.class);
                     pan = objectMapper.readValue(rs.getString("pan"), Position.class);
                     graph = new Graph(
-                            rs.getString("name"),
+//                            rs.getString("name"),
                             element,
                             styleRules,
                             rs.getBoolean("boxSelectionEnabled"),

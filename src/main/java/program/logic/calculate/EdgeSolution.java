@@ -24,9 +24,9 @@ public class EdgeSolution {
             int load = equipment.getLoad();
             String nodeType = data.getNodeType();
 
-            if (nodeType.toString().equals("источник")) {
+            if (nodeType.toString().equals("source")) {
                 b.add(maxGen);
-            }else if (nodeType.toString().equals("потребитель")) {
+            }else if (nodeType.toString().equals("consumer")) {
                 load = load * (-1);
                 b.add(load);
             }else {

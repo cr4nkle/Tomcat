@@ -31,7 +31,7 @@ public class Edge {
     public Edge () {}
 
     @JsonCreator
-    public Edge (int idFromDB,
+    public Edge (
             @JsonProperty("data") Data data,
             @JsonProperty("position") Position position,
             @JsonProperty("group") String group,
@@ -42,7 +42,7 @@ public class Edge {
             @JsonProperty("grabbable") boolean grabbable,
             @JsonProperty("pannable") boolean pannable,
             @JsonProperty("classes") String classes) {
-        this.idFromDB = idFromDB;
+//        this.idFromDB = idFromDB;
         this.data = data;
         this.classes = classes;
         this.position = position;

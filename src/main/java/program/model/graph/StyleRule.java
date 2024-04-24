@@ -15,10 +15,10 @@ public class StyleRule {
     public StyleRule () {}
 
     @JsonCreator
-    public StyleRule (int idFromDB,
+    public StyleRule (
                       @JsonProperty("selector") String selector,
                       @JsonProperty("style") Style style) {
-        this.idFromDB = idFromDB;
+//        this.idFromDB = idFromDB;
         this.selector = selector;
         this.style = style;
     }

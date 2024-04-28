@@ -1,40 +1,49 @@
 package program.model.compressedGraph;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class EdgeData {
+    @JsonProperty("system-type")
     private String systemType;
-    private float price;
+    @JsonProperty("throughput")
     private int throughput;
+    @JsonProperty("resistance")
     private int resistance;
+    @JsonProperty("cost")
     private int cost;
+    @JsonProperty("max-generation")
     private int maxGen;
+    @JsonProperty("min-generation")
     private int minGen;
-    private int load;
+    @JsonProperty("source")
     private String source;
+    @JsonProperty("target")
     private String target;
 
-    public EdgeData(){
+    public EdgeData() {
 
     }
 
+    @JsonCreator
     public EdgeData(
-            String systemType,
-            int price,
-            int throughput,
-            int resistance,
-            int cost,
-            int maxGen,
-            int minGen,
-            int load,
-            String source,
-            String target){
+            @JsonProperty("system-type") String systemType,
+            @JsonProperty("throughput") int throughput,
+            @JsonProperty("resistance") int resistance,
+            @JsonProperty("cost") int cost,
+            @JsonProperty("max-generation") int maxGen,
+            @JsonProperty("min-generation") int minGen,
+            @JsonProperty("source") String source,
+            @JsonProperty("target") String target) {
         this.cost = cost;
-        this.load = load;
         this.systemType = systemType;
         this.maxGen = maxGen;
         this.minGen = minGen;
         this.source = source;
-        this.price = price;
         this.throughput = throughput;
         this.resistance = resistance;
         this.target = target;
@@ -72,7 +81,35 @@ public class EdgeData {
         return minGen;
     }
 
-    public int getLoad() {
-        return load;
+    public void setSystemType(String systemType) {
+        this.systemType = systemType;
+    }
+
+    public void setCost(int cost) {
+        this.cost = cost;
+    }
+
+    public void setMaxGen(int maxGen) {
+        this.maxGen = maxGen;
+    }
+
+    public void setMinGen(int minGen) {
+        this.minGen = minGen;
+    }
+
+    public void setTarget(String target) {
+        this.target = target;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    public void setResistance(int resistance) {
+        this.resistance = resistance;
+    }
+
+    public void setThroughput(int throughput) {
+        this.throughput = throughput;
     }
 }

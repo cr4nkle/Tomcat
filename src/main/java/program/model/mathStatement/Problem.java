@@ -7,15 +7,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import program.model.compressedGraph.EdgeData;
 import program.model.compressedGraph.NodeData;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Problem {
     @JsonProperty("node-id")
-    private String[] nodeId;
+    private ArrayList<String> nodeId;
     @JsonProperty("edge-id")
-    private String[] edgeId;
+    private ArrayList<String> edgeId;
     @JsonProperty("node")
     private HashMap<String, NodeData> node;
     @JsonProperty("edge")
@@ -27,8 +28,8 @@ public class Problem {
 
     @JsonCreator
     public Problem(
-            @JsonProperty("node-id") String[] nodeId,
-            @JsonProperty("edge-id") String[] edgeId,
+            @JsonProperty("node-id") ArrayList<String> nodeId,
+            @JsonProperty("edge-id") ArrayList<String> edgeId,
             @JsonProperty("node") HashMap<String, NodeData> node,
             @JsonProperty("edge") HashMap<String, EdgeData> edge) {
         this.edge = edge;
@@ -45,11 +46,11 @@ public class Problem {
         return node;
     }
 
-    public String[] getEdgeId() {
+    public ArrayList<String> getEdgeId() {
         return edgeId;
     }
 
-    public String[] getNodeId() {
+    public ArrayList<String> getNodeId() {
         return nodeId;
     }
 
@@ -57,7 +58,7 @@ public class Problem {
         this.edge = edge;
     }
 
-    public void setEdgeId(String[] edgeId) {
+    public void setEdgeId(ArrayList<String> edgeId) {
         this.edgeId = edgeId;
     }
 
@@ -65,7 +66,7 @@ public class Problem {
         this.node = node;
     }
 
-    public void setNodeId(String[] nodeId) {
+    public void setNodeId(ArrayList<String> nodeId) {
         this.nodeId = nodeId;
     }
 }

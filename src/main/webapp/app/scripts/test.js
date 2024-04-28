@@ -15,7 +15,7 @@ const styleUrl = "http://localhost:8080/app/api/get/style";
 const getLinesUrl = "http://localhost:8080/app/api/get/lines";
 const getConsumerUrl = "http://localhost:8080/app/api/get/consumers";
 const getSourceUrl = "http://localhost:8080/app/api/get/sources";
-const saveModelUrl = "http://localhost:8080/app/api/post/test/saveModel";
+const saveModelUrl = "http://localhost:8080/app/api/post/saveModel";
 const calculateUrl = "http://localhost:8080/app/api/post/calculate";
 //переменные с начальным значением
 var addEdgeOn,
@@ -67,7 +67,7 @@ uploadFromDb.addEventListener("click", async () => {
   } else {
     alert("Ввод отменен");
   }
-  let url = `http://localhost:8080/app/api/get/test?name=${modelName}`;
+  let url = `http://localhost:8080/app/api/get/model?name=${modelName}`;
   cy = await initializeGraph(new Request(url), container);
   initializeGraphMethods(cy);
   setModeValue(false, false, false, false);
@@ -87,7 +87,8 @@ download.addEventListener("click", () => {
 });
 
 deleteModel.addEventListener("click", () => {
-  console.log("нужно дописать запрос на каскадное удалление"); //нужно дописать запрос на каскадное удалление
+  let deleteUrl = `http://localhost:8080/app/api/delete/model?name=${modelName}`;
+  deleteDataFromServer(deleteUrl);
 });
 
 toolBtns.forEach((btn) => {
@@ -138,8 +139,8 @@ hideCheckboxes.forEach((checkbox) => {
 });
 //функции для работы приложения
 function removeExtension(filename) {
-  return filename.substring(0, filename.lastIndexOf('.')) || filename;
- }
+  return filename.substring(0, filename.lastIndexOf(".")) || filename;
+}
 function setModeValue(isAddNodeOn, isAddEdgeOn, isEditModeOn, isDelModeOn) {
   addNodeOn = isAddNodeOn;
   addEdgeOn = isAddEdgeOn;
@@ -156,15 +157,12 @@ function btnSelected(btnId) {
   switch (btnId) {
     case "triangle":
       nodeType = "source";
-      // setModeValue(true, false, false, false);
       break;
     case "rectangle":
       nodeType = "connector";
-      // setModeValue(true, false, false, false);
       break;
     case "circle":
       nodeType = "consumer";
-      // setModeValue(true, false, false, false);
       break;
     case "edit":
       setModeValue(false, false, true, false);
@@ -221,6 +219,22 @@ function loadDataOnServer(url, data, method) {
     xhr.send(data);
   });
 }
+function deleteDataFromServer(url) {
+  let xhr = new XMLHttpRequest();
+  xhr.open("DELETE", url, true);
+  xhr.setRequestHeader("Content-Type", "application/json");
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4) {
+      if (xhr.status === 200) {
+        let responseArray = JSON.parse(xhr.responseText);
+        console.log(responseArray);
+      } else {
+        console.log(new Error("Ошибка запроса: " + xhr.status));
+      }
+    }
+  };
+  xhr.send();
+}
 function downloadGraph(fileName) {
   if (cy !== null) {
     var graphJSON = cy.json();
@@ -248,9 +262,10 @@ function initializeGraph(request, container) {
       }),
     ])
       .then((dataArray) => {
+        console.log(dataArray);
         const cy = cytoscape({
           container: container,
-          style: dataArray[0].style,
+          style: dataArray[1].style,
           elements: dataArray[0].elements,
           layout: layout,
         });
@@ -400,7 +415,7 @@ function addEdgeToGraph(id) {
 //конец
 
 const scrollableList = document.getElementById("scrollableList");
-loadDataFromServer(getLinesUrl).then((data) => {
+loadDataFromServer(getSourceUrl).then((data) => {
   data.forEach((item) => {
     const listItem = document.createElement("div");
     const checkbox = document.createElement("input");

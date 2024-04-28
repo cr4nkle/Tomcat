@@ -4,28 +4,6 @@
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee webapp_4_0.xsd"
          version="4.0">
   <servlet>
-    <servlet-name>first-servlet</servlet-name>
-    <servlet-class>servlet.MyServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>first-servlet</servlet-name>
-    <url-pattern>/first-servlet</url-pattern>
-  </servlet-mapping>
-
-  <servlet-mapping>
-    <servlet-name>default</servlet-name>
-    <url-pattern>/*</url-pattern>
-  </servlet-mapping>
-
-  <servlet>
-    <servlet-name>TestServlet</servlet-name>
-    <servlet-class>servlet.TestServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>TestServlet</servlet-name>
-    <url-pattern>/main</url-pattern>
-  </servlet-mapping>
-  <servlet>
     <servlet-name>Jersey REST Service</servlet-name>
     <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
     <init-param>

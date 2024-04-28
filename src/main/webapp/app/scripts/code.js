@@ -64,7 +64,7 @@ fetch("http://localhost:8080/app/api/get/lines")
 inputElement.addEventListener("change", function (e) {
   var file = e.target.files[0];
   modelName = file.name;
-  console.log(modelNamel);
+  console.log(modelName);
   var url = URL.createObjectURL(file);
   setModeValue(false, false, false, false);
   start(new Request(url));
@@ -87,7 +87,7 @@ function start(request) {
       return res.json();
     }),
   ]).then((dataArray) => {
-    // console.log(dataArray[0].style);
+    console.log(dataArray[0].style);
     // Создаём экземпляр графа
     cy = window.cy = cytoscape({
       container: container,
@@ -368,6 +368,7 @@ function sendJSON() {
   let xhr = new XMLHttpRequest();
   let url = "http://localhost:8080/app/api/post/calculate";
 
+  graphJSON.name = modelName;
   xhr.open("POST", url, true);
   xhr.setRequestHeader("Content-Type", "application/json");
 

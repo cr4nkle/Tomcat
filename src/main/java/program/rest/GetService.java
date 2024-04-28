@@ -54,15 +54,15 @@ public class GetService {
     @Path("/model")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getModel(@QueryParam("name") String name) {
-        return getData(() -> PostgresFirstHandler.getInstance().readModelByName(name));
-    }
-
-    @GET
-    @Path("/test")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getTest(@QueryParam("name") String name) {
         return getData(() -> PostgresThirdHandler.getInstance().readModelByName(name));
     }
+
+//    @GET
+//    @Path("/test")
+//    @Produces(MediaType.APPLICATION_JSON)
+//    public Response getTest(@QueryParam("name") String name) {
+//        return getData(() -> PostgresThirdHandler.getInstance().readModelByName(name));
+//    }
 
     @GET
     @Path("/style")

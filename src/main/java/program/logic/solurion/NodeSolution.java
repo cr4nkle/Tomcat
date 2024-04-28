@@ -1,4 +1,4 @@
-package program.logic.calculate;
+package program.logic.solurion;
 
 import program.model.graph.*;
 import program.model.mathStatement.MathStatement;

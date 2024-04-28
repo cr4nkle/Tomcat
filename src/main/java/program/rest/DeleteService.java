@@ -1,5 +1,7 @@
 package program.rest;
 
+import program.database.PostgresThirdHandler;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.Path;
@@ -13,7 +15,9 @@ public class DeleteService {
     @Path("/model")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteModel(@QueryParam("name") String name) {
-        return Response.ok().build();
+        PostgresThirdHandler postgresThirdHandler = PostgresThirdHandler.getInstance();
+        postgresThirdHandler.deleteModel(name);
+        return Response.ok("{\"message\": \"Удалено\"}").build();
     }
 
     @DELETE

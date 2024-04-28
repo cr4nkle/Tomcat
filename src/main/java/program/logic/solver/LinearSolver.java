@@ -3,11 +3,15 @@ package program.logic.solver;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lpsolve.*;
 import program.model.mathStatement.MathStatement;
+import program.model.mathStatement.Solution;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class LinearSolver {
     private static LpSolve problem;// создаём экземпляр решателя
 
-    public static void optimate(MathStatement mathStatement) {
+    public static Solution optimate(MathStatement mathStatement) {
         ObjectMapper objectMapper = new ObjectMapper();
         double[][] matrix = objectMapper.convertValue(mathStatement.getMatrix(), double[][].class);
         double[] goal = objectMapper.convertValue(mathStatement.getGoal(), double[].class);
@@ -38,20 +42,25 @@ public class LinearSolver {
             for (double mn : min) {
                 problem.setLowbo(i++, mn);
             }
+
             i = 1;
             for (double mx : max) {
                 problem.setUpbo(i++, mx);
             }
 
-            problem.printLp();// печатаем постановку задачи, потом убрать можно
             problem.solve();// вызываем функцию, которая решает задачу
+            double objective = problem.getWorkingObjective();
+            double[] variables = problem.getPtrVariables();
+
+            return new Solution(mathStatement, objective, variables);
         } catch (LpSolveException e) {
             throw new RuntimeException(e);
         }
+
     }
 
     // функция возвращает значение целевой функции
-    public static double getObjective(){
+    public static double getObjective() {
         if (problem != null) {
             try {
                 return problem.getWorkingObjective();
@@ -64,7 +73,7 @@ public class LinearSolver {
     }
 
     // функция возвращает вектор переменных
-    public static double[] getVariables()  {
+    public static double[] getVariables() {
         if (problem != null) {
             try {
                 return problem.getPtrVariables();

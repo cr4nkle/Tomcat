@@ -5,14 +5,21 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import program.database.PostgresThirdHandler;
+import program.logic.solurion.LinearStatement;
 import program.logic.solurion.NodeSolution;
 import program.model.compressedGraph.Graph;
 import program.model.mathStatement.MathStatement;
+import program.model.mathStatement.Problem;
+import program.model.mathStatement.Solution;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalTime;
+
+import static program.logic.solver.LinearSolver.optimate;
 
 @Path("/post")
 public class PostService {
@@ -56,27 +63,13 @@ public class PostService {
     @Path("/calculate")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response calculate(program.model.graph.Graph graph) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-//        EdgeSolution edgeSolution = new EdgeSolution();
-        NodeSolution nodeSolution = new NodeSolution();
-        String jsonString = null;
-//        try {
-////            MathStatement mathStatement = edgeSolution.getSolution(graph);
-//
-////            MathStatement mathStatement = nodeSolution.getSolution(graph);
-////            jsonString = objectMapper.writeValueAsString(mathStatement);
-////            System.out.println(jsonString);
-////            Graph graph = objectMapper.readValue(query, Graph.class);
-////        } catch (JsonProcessingException e) {
-////            e.printStackTrace();
-////            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error processing request").build();
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-
-        return Response.ok(jsonString).build();
+    public Response calculate(Problem problem) {
+        LocalTime time1 = LocalTime.now();
+        MathStatement mathStatement = LinearStatement.getLinearStatement(problem);
+        Solution solution = optimate(mathStatement);
+        LocalTime time2 = LocalTime.now();
+        Duration duration = Duration.between(time1, time2);
+        System.out.println(duration.toMillis() + " миллисекунд");
+        return Response.ok(solution).build();
     }
 }

@@ -16,10 +16,8 @@ public class EdgeData {
     private int resistance;
     @JsonProperty("cost")
     private int cost;
-    @JsonProperty("max-generation")
-    private int maxGen;
-    @JsonProperty("min-generation")
-    private int minGen;
+    @JsonProperty("length")
+    private double length;
     @JsonProperty("source")
     private String source;
     @JsonProperty("target")
@@ -35,14 +33,12 @@ public class EdgeData {
             @JsonProperty("throughput") int throughput,
             @JsonProperty("resistance") int resistance,
             @JsonProperty("cost") int cost,
-            @JsonProperty("max-generation") int maxGen,
-            @JsonProperty("min-generation") int minGen,
+            @JsonProperty("length") double length,
             @JsonProperty("source") String source,
             @JsonProperty("target") String target) {
         this.cost = cost;
         this.systemType = systemType;
-        this.maxGen = maxGen;
-        this.minGen = minGen;
+        this.length = length;
         this.source = source;
         this.throughput = throughput;
         this.resistance = resistance;
@@ -73,28 +69,12 @@ public class EdgeData {
         return source;
     }
 
-    public int getMaxGen() {
-        return maxGen;
-    }
-
-    public int getMinGen() {
-        return minGen;
-    }
-
     public void setSystemType(String systemType) {
         this.systemType = systemType;
     }
 
     public void setCost(int cost) {
         this.cost = cost;
-    }
-
-    public void setMaxGen(int maxGen) {
-        this.maxGen = maxGen;
-    }
-
-    public void setMinGen(int minGen) {
-        this.minGen = minGen;
     }
 
     public void setTarget(String target) {
@@ -111,5 +91,26 @@ public class EdgeData {
 
     public void setThroughput(int throughput) {
         this.throughput = throughput;
+    }
+
+    public void setLength(double length) {
+        this.length = length;
+    }
+
+    public double getLength() {
+        return length;
+    }
+
+    @Override
+    public String toString() {
+        return "EdgeData{" +
+                "systemType='" + systemType + '\'' +
+                ", throughput=" + throughput +
+                ", resistance=" + resistance +
+                ", cost=" + cost +
+                ", length=" + length +
+                ", source='" + source + '\'' +
+                ", target='" + target + '\'' +
+                '}';
     }
 }

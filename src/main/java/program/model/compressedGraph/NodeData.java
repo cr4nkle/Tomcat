@@ -112,4 +112,18 @@ public class NodeData {
     public void setInstalled(boolean installed) {
         this.installed = installed;
     }
+
+    @Override
+    public String toString() {
+        return "NodeData{" +
+                "systemType='" + systemType + '\'' +
+                ", nodeType='" + nodeType + '\'' +
+                ", price=" + price +
+                ", cost=" + cost +
+                ", maxGen=" + maxGen +
+                ", minGen=" + minGen +
+                ", load=" + load +
+                ", installed=" + installed +
+                '}';
+    }
 }

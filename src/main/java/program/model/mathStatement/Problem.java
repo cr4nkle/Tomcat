@@ -9,6 +9,7 @@ import program.model.compressedGraph.NodeData;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -68,5 +69,24 @@ public class Problem {
 
     public void setNodeId(ArrayList<String> nodeId) {
         this.nodeId = nodeId;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Problem{");
+        sb.append("nodeId=").append(nodeId).append(", ");
+        sb.append("edgeId=").append(edgeId).append(", ");
+        sb.append("node={");
+        for (Map.Entry<String, NodeData> entry : node.entrySet()) {
+            sb.append(entry.getKey()).append("=").append(entry.getValue()).append(", ");
+        }
+        sb.append("}, ");
+        sb.append("edge={");
+        for (Map.Entry<String, EdgeData> entry : edge.entrySet()) {
+            sb.append(entry.getKey()).append("=").append(entry.getValue()).append(", ");
+        }
+        sb.append("}}");
+        return sb.toString();
     }
 }

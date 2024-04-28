@@ -1,10 +1,8 @@
-package program.logic;
+package program.logic.solver;
 
 import lpsolve.*;
 
-import java.util.ArrayList;
-
-public class Optimator {
+public class LinearSolver {
     private static LpSolve problem;// создаём экземпляр решателя
 
     /**

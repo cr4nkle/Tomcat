@@ -1,16 +1,18 @@
 package program;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lpsolve.LpSolveException;
-import program.model.compressedGraph.CalcEdge;
-import program.model.compressedGraph.CalcNode;
+import program.model.compressedGraph.EdgeData;
+import program.model.compressedGraph.NodeData;
+import program.model.mathStatement.MathStatement;
 
 import java.time.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import static program.logic.Optimator.*;
+import static program.logic.solver.LinearSolver.*;
 
 
 public class Main {
@@ -35,17 +37,17 @@ public class Main {
         second.add("sin");
         second.add("lim");
 
-        CalcNode node1 = new CalcNode("source", 2, 20, 5, 0, 0, "heat", true);
-        CalcNode node2 = new CalcNode("source", 3, 30, 6, 0, 0, "heat", true);
-        CalcNode node3 = new CalcNode("consumer", 0, 0, 0, 0, 2, "heat", false);
-        CalcNode node4 = new CalcNode("consumer", 0, 0, 0, 0, 3, "heat", false);
-        CalcNode node5 = new CalcNode("connector", 0, 0, 0, 0, 0, "heat", false);
-        CalcEdge edge1 = new CalcEdge("heat", 2, 5, 0, 0, 0, 0, 0, "n1", "n2");
-        CalcEdge edge2 = new CalcEdge("heat", 2, 6, 0, 0, 0, 0, 0, "n1c", "n2");
-        CalcEdge edge3 = new CalcEdge("heat", 2, 3, 0, 0, 0, 0, 0, "n2", "n3");
-        CalcEdge edge4 = new CalcEdge("heat", 2, 4, 0, 0, 0, 0, 0, "n2", "n4");
-        HashMap<String, CalcNode> node = new HashMap<>();
-        HashMap<String, CalcEdge> edge = new HashMap<>();
+        NodeData node1 = new NodeData("source", 2, 20, 5, 0, 0, "heat", true);
+        NodeData node2 = new NodeData("source", 3, 30, 6, 0, 0, "heat", true);
+        NodeData node3 = new NodeData("consumer", 0, 0, 0, 0, 2, "heat", false);
+        NodeData node4 = new NodeData("consumer", 0, 0, 0, 0, 3, "heat", false);
+        NodeData node5 = new NodeData("connector", 0, 0, 0, 0, 0, "heat", false);
+        EdgeData edge1 = new EdgeData("heat", 2, 5, 0, 0, 0, 0, 0, "n1", "n2");
+        EdgeData edge2 = new EdgeData("heat", 2, 6, 0, 0, 0, 0, 0, "n1c", "n2");
+        EdgeData edge3 = new EdgeData("heat", 2, 3, 0, 0, 0, 0, 0, "n2", "n3");
+        EdgeData edge4 = new EdgeData("heat", 2, 4, 0, 0, 0, 0, 0, "n2", "n4");
+        HashMap<String, NodeData> node = new HashMap<>();
+        HashMap<String, EdgeData> edge = new HashMap<>();
         node.put("n1", node1);
         node.put("n1c", node2);
         node.put("n2", node5);
@@ -75,7 +77,7 @@ public class Main {
             second.forEach(s -> {
                 if (node.containsKey(f)) {
                     double v = 0;
-                    CalcNode n = node.get(f);
+                    NodeData n = node.get(f);
                     String nodeType = n.getNodeType();
 
                     switch (s) {
@@ -88,7 +90,7 @@ public class Main {
                             lim.add(v);
                             break;
                         default:
-                            CalcEdge e = edge.get(s);
+                            EdgeData e = edge.get(s);
                             boolean isSource = f.equals(e.getSource());
                             boolean isTarget = f.equals(e.getTarget());
                             if (isSource) {
@@ -122,8 +124,8 @@ public class Main {
 
         second.forEach(s -> {
             first.forEach(t -> {
-                CalcNode n = node.get(t);
-                CalcEdge e = edge.get(s);
+                NodeData n = node.get(t);
+                EdgeData e = edge.get(s);
                 boolean isSource = t.equals(e.getSource());
                 boolean isTarget = t.equals(e.getTarget());
                 String nodeType = n.getNodeType();
@@ -181,7 +183,7 @@ public class Main {
 //            System.out.print(x + " ");
 //        });
 //        System.out.println();
-
+        MathStatement mathStatement = new MathStatement(lim, max, min, goal, matrix, sin, type);
 
         try {
 //            double[] f = { 0, 2, 3, 0, 0, 20, 30 };// коэффициенты целевой функции
@@ -206,11 +208,15 @@ public class Main {
             double[] maxC = objectMapper.convertValue(max, double[].class);
             int[] sinC = objectMapper.convertValue(sin, int[].class);
             boolean[] typeC = objectMapper.convertValue(type, boolean[].class);
+            String s = objectMapper.writeValueAsString(mathStatement);
+            System.out.println(s);
             optimate(goalC, matrixC, sinC, limC, minC, maxC, typeC);// вызываем функцию оптимизации
             System.out.println(getObjective());// выводим значение целевой функции
             System.out.println(Arrays.toString(getVariables()));// выводим значения переменных
         } catch (LpSolveException e) {
             e.printStackTrace();
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
         LocalTime time2 = LocalTime.now();
         Duration duration = Duration.between(time1, time2);

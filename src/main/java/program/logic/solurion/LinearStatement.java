@@ -1,4 +1,4 @@
 package program.logic.solurion;
 
-public class NonLinearSolution {
+public class LinearStatement {
 }

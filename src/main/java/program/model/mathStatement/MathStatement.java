@@ -4,89 +4,101 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MathStatement {
-    @JsonProperty("b")
-    private ArrayList<Integer> b;
+    @JsonProperty("limits")
+    private ArrayList<Double> lim;
     @JsonProperty("max")
-    private ArrayList<Integer> max;
+    private ArrayList<Double> max;
     @JsonProperty("min")
-    private ArrayList<Integer> min;
+    private ArrayList<Double> min;
     @JsonProperty("goal")
-    private ArrayList<Integer> goal;
+    private ArrayList<Double> goal;
     @JsonProperty("matrix")
-    private ArrayList<ArrayList<Integer>> matrix;
+    private ArrayList<ArrayList<Double>> matrix;
+    @JsonProperty("sign")
+    private ArrayList<Integer> sign;
+    @JsonProperty("type")
+    private ArrayList<Boolean> type;
 
-    public MathStatement () {}
+    public MathStatement() {
+    }
 
     @JsonCreator
-    public MathStatement (@JsonProperty("b") ArrayList<Integer> b,
-                          @JsonProperty("max") ArrayList<Integer> max,
-                          @JsonProperty("min") ArrayList<Integer> min,
-                          @JsonProperty("goal") ArrayList<Integer> goal,
-                          @JsonProperty("matrix") ArrayList<ArrayList<Integer>> matrix){
-        this.b = b;
+    public MathStatement(
+            @JsonProperty("limits") ArrayList<Double> lim,
+            @JsonProperty("max") ArrayList<Double> max,
+            @JsonProperty("min") ArrayList<Double> min,
+            @JsonProperty("goal") ArrayList<Double> goal,
+            @JsonProperty("matrix") ArrayList<ArrayList<Double>> matrix,
+            @JsonProperty("sign") ArrayList<Integer> sign,
+            @JsonProperty("type") ArrayList<Boolean> type) {
+        this.lim = lim;
         this.min = min;
         this.max = max;
         this.goal = goal;
         this.matrix = matrix;
+        this.sign = sign;
+        this.type= type;
     }
 
-    public ArrayList<Integer> getB() {
-        return b;
+    public void setMin(ArrayList<Double> min) {
+        this.min = min;
     }
 
-    public ArrayList<ArrayList<Integer>> getMatrix() {
+    public void setMax(ArrayList<Double> max) {
+        this.max = max;
+    }
+
+    public void setMatrix(ArrayList<ArrayList<Double>> matrix) {
+        this.matrix = matrix;
+    }
+
+    public void setGoal(ArrayList<Double> goal) {
+        this.goal = goal;
+    }
+
+    public void setLim(ArrayList<Double> lim) {
+        this.lim = lim;
+    }
+
+    public void setType(ArrayList<Boolean> type) {
+        this.type = type;
+    }
+
+    public ArrayList<ArrayList<Double>> getMatrix() {
         return matrix;
     }
 
-    public ArrayList<Integer> getGoal() {
+    public ArrayList<Boolean> getType() {
+        return type;
+    }
+
+    public ArrayList<Double> getGoal() {
         return goal;
     }
 
-    public ArrayList<Integer> getMax() {
+    public ArrayList<Double> getMax() {
         return max;
     }
 
-    public void setB(ArrayList<Integer> b) {
-        this.b = b;
-    }
-
-    public ArrayList<Integer> getMin() {
+    public ArrayList<Double> getMin() {
         return min;
     }
 
-    public void setGoal(ArrayList<Integer> goal) {
-        this.goal = goal;
+    public ArrayList<Integer> getSign() {
+        return sign;
     }
 
-    public void setMatrix(ArrayList<ArrayList<Integer>> matrix) {
-        this.matrix = matrix;
+    public void setSign(ArrayList<Integer> sign) {
+        this.sign = sign;
     }
 
-    public void setMax(ArrayList<Integer> max) {
-        this.max = max;
-    }
-
-    public void setMin(ArrayList<Integer> min) {
-        this.min = min;
-    }
-
-    @Override
-    public String toString() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        String result = null;
-        try {
-            result = objectMapper.writeValueAsString(this);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-        return result;
+    public ArrayList<Double> getLim() {
+        return lim;
     }
 }

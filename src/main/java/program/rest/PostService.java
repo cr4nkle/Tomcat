@@ -63,19 +63,19 @@ public class PostService {
 //        EdgeSolution edgeSolution = new EdgeSolution();
         NodeSolution nodeSolution = new NodeSolution();
         String jsonString = null;
-        try {
-//            MathStatement mathStatement = edgeSolution.getSolution(graph);
-
-            MathStatement mathStatement = nodeSolution.getSolution(graph);
-            jsonString = objectMapper.writeValueAsString(mathStatement);
-//            System.out.println(jsonString);
-//            Graph graph = objectMapper.readValue(query, Graph.class);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error processing request").build();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+//        try {
+////            MathStatement mathStatement = edgeSolution.getSolution(graph);
+//
+////            MathStatement mathStatement = nodeSolution.getSolution(graph);
+////            jsonString = objectMapper.writeValueAsString(mathStatement);
+////            System.out.println(jsonString);
+////            Graph graph = objectMapper.readValue(query, Graph.class);
+////        } catch (JsonProcessingException e) {
+////            e.printStackTrace();
+////            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error processing request").build();
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
 
         return Response.ok(jsonString).build();
     }

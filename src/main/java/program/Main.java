@@ -77,8 +77,8 @@ public class Main {
         HashMap<String, NodeData> node = new HashMap<>();
         HashMap<String, EdgeData> edge = new HashMap<>();
         node.put("n1", node1);
-        node.put("n1c", node2);
-        node.put("n1cc", node6);
+        node.put("n1с", node2);
+        node.put("n1сс", node6);
         node.put("n2", node5);
         node.put("n3", node3);
         node.put("n4", node4);
@@ -90,8 +90,8 @@ public class Main {
         node.put("n10", node3);
 
         edge.put("e12", edge1);
-        edge.put("e12c", edge2);
-        edge.put("e12cc", edge11);
+        edge.put("e12с", edge2);
+        edge.put("e12сс", edge11);
         edge.put("e23", edge3);
         edge.put("e24", edge4);
         edge.put("e25", edge5);
@@ -101,8 +101,8 @@ public class Main {
         edge.put("e89", edge9);
         edge.put("e810", edge10);
         edge.put("e12d", edge1);
-        edge.put("e12cd", edge2);
-        edge.put("e12ccd", edge11);
+        edge.put("e12сd", edge2);
+        edge.put("e12ссd", edge11);
 
         LocalTime time1 = LocalTime.now();
 //        ArrayList<ArrayList<Double>> matrix = new ArrayList<>();

@@ -102,58 +102,10 @@ toolBtns.forEach((btn) => {
 
 calculate.addEventListener("click", async () => {
   if (cy !== null) {
-    var nodeIds = cy.nodes().map((node) => {
-      return node.id();
-    });
-
-    var newNodeIds = [];
-    var newEdgeIds = [];
-
-    nodeIds.forEach((nodeId) => {
-      var node = cy.$("#" + nodeId);
-      var equipment = node.data("equipment");
-      var connectedEdges = node.connectedEdges();
-      var nodeIdCopy;
-      var edgeIdCopy;
-      var edgeIdDuplicate;
-      var flag = false;
-      var edgeId;
-
-      connectedEdges.forEach(function (edge) {
-        var sourceNodeId = edge.source().id();
-        edgeId = edge.id();
-        edgeIdDuplicate = edgeId + "d";
-        if (nodeId === sourceNodeId) {
-          newEdgeIds.push(edgeId);
-        }
-      });
-
-      nodeIdCopy = nodeId;
-      edgeIdCopy = edgeId;
-
-      equipment.forEach((item) => {
-        if (item.installed === false) {
-          newNodeIds.push(nodeIdCopy);
-          if (!newEdgeIds.includes(edgeIdCopy)) {
-            newEdgeIds.push(edgeIdCopy);
-          }
-          newEdgeIds.push(edgeIdDuplicate);
-          nodeIdCopy += "c";
-          edgeIdCopy += "c";
-          edgeIdDuplicate = edgeIdCopy + "d";
-          flag = true;
-        }
-      });
-
-      if (!flag) {
-        newNodeIds.push(nodeId);
-      }
-    });
-
-    newNodeIds.push("lim");
-    newEdgeIds.push("sign", "lim");
-    console.log(newNodeIds);
-    console.log(newEdgeIds);
+    let problem = getProblem(cy);
+    let data = JSON.stringify(problem);
+    let result = await loadDataOnServer(calculateUrl, data, "POST");
+    console.log(result);
   }
 });
 
@@ -361,6 +313,11 @@ function initializeGraphMethods(cy) {
 
     if (editModeOn) {
       setChecked(systemType, editCheckboxes);
+      // editCheckboxes.forEach(function (checkbox) {
+      //   console.log("dkjd");
+      //   checkbox.style.display = "inline-block";
+      //   checkbox.style.width = "80px";
+      // });
 
       equipment.forEach((element) => {
         setChecked(`${element.id}`, checkedCheckboxes);
@@ -400,7 +357,7 @@ function addNodeToGraph(e) {
     var node = [
       {
         data: {
-          id: `${nodeId++}`,
+          id: `n${nodeId++}`,
           nodetype: nodeType,
           systemtype: "heat",
           length: 0,
@@ -443,8 +400,8 @@ function addEdgeToGraph(id) {
                 name: "edge",
                 price: 0.0,
                 throughput: 0,
-                resistance: 1,
-                cost: 10,
+                resistance: 0,
+                cost: 0,
                 max_gen: 0,
                 min_gen: 0,
                 load: 0,
@@ -460,11 +417,110 @@ function addEdgeToGraph(id) {
     }
   }
 }
+
+function getProblem(cy) {
+  var nodeIds = cy.nodes().map((node) => {
+    return node.id();
+  });
+
+  var data = { "node-id": [], "edge-id": [], node: {}, edge: {} };
+
+  nodeIds.forEach((nodeId) => {
+    var node = cy.$("#" + nodeId);
+    var equipment = node.data("equipment");
+    var connectedEdges = node.connectedEdges();
+    var nodeIdCopy;
+    var edgeIdCopy;
+    var edgeIdDuplicate;
+    var flag = false;
+    var edgeId;
+
+    connectedEdges.forEach(function (edge) {
+      var sourceNodeId = edge.source().id();
+      var targetNodeId = edge.target().id();
+
+      edgeId = edge.id();
+      edgeIdDuplicate = edgeId + "d";
+
+      if (nodeId === sourceNodeId) {
+        let eq = edge.data("equipment");
+        data["edge-id"].push(edgeId);
+        data["edge"][edgeId] = {
+          "system-type": edge.data("systemtype"),
+          throughput: eq[0].throughput,
+          resistance: eq[0].resistance,
+          cost: eq[0].cost,
+          length: edge.data("length"),
+          source: sourceNodeId,
+          target: targetNodeId,
+        };
+      }
+    });
+
+    nodeIdCopy = nodeId;
+    edgeIdCopy = edgeId;
+
+    equipment.forEach((item) => {
+      if (item.installed === false) {
+        data["node-id"].push(nodeIdCopy);
+        data["node"][nodeIdCopy] = {
+          "system-type": node.data("systemtype"),
+          "node-type": node.data("nodetype"),
+          price: item.price,
+          cost: item.cost,
+          "max-generation": item.max_gen,
+          "min-generation": item.min_gen,
+          load: item.load,
+          installed: item.installed,
+        };
+
+        // console.log(data["edge"][edgeId]);
+        // console.log(edgeId);
+        // console.log(edgeIdCopy);
+        console.log(data["node-id"], data["edge-id"]);
+        if (!data["edge-id"].includes(edgeIdCopy)) {
+          data["edge-id"].push(edgeIdCopy);
+          data["edge"][edgeIdCopy] = JSON.parse(
+            JSON.stringify(data["edge"][edgeId])
+          ); //сделали глубокую копию
+          data["edge"][edgeIdCopy].source = nodeIdCopy;
+        }
+        data["edge-id"].push(edgeIdDuplicate);
+        data["edge"][edgeIdDuplicate] = data["edge"][edgeIdCopy];
+
+        nodeIdCopy += "c";
+        edgeIdCopy += "c";
+        edgeIdDuplicate = edgeIdCopy + "d";
+        flag = true;
+      }
+    });
+
+    if (!flag) {
+      data["node-id"].push(nodeId);
+      data["node"][nodeId] = {
+        "system-type": node.data("systemtype"),
+        "node-type": node.data("nodetype"),
+        price: equipment[0].price,
+        cost: equipment[0].cost,
+        "max-generation": equipment[0].max_gen,
+        "min-generation": equipment[0].min_gen,
+        load: equipment[0].load,
+        installed: equipment[0].installed,
+      };
+    }
+  });
+
+  data["node-id"].push("lim");
+  data["edge-id"].push("sign", "lim");
+
+  return data;
+}
 //конец
 
 const scrollableList = document.getElementById("scrollableList");
 loadDataFromServer(getSourceUrl).then((data) => {
   data.forEach((item) => {
+    // console.log(item);
     const listItem = document.createElement("div");
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
@@ -472,7 +528,7 @@ loadDataFromServer(getSourceUrl).then((data) => {
     checkbox.className = "group3";
     checkbox.value = item.id;
     checkbox.id = `${item.id}`;
-    console.log(checkbox.id);
+    // console.log(checkbox.id);
 
     listItem.appendChild(checkbox);
     listItem.appendChild(document.createElement("br"));
@@ -521,3 +577,10 @@ function setChecked(id, checkboxes) {
     }
   });
 }
+
+// editCheckboxes.forEach((checkbox) => {
+//   checkbox.addEventListener("change")
+//   if (checkbox.checked) {
+//     console.log(checkbox.id);
+//   }
+// });

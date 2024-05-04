@@ -14,9 +14,9 @@ import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Problem {
-    @JsonProperty("node-id")
+    @JsonProperty("node_id")
     private ArrayList<String> nodeId;
-    @JsonProperty("edge-id")
+    @JsonProperty("edge_id")
     private ArrayList<String> edgeId;
     @JsonProperty("node")
     private HashMap<String, NodeData> node;
@@ -29,8 +29,8 @@ public class Problem {
 
     @JsonCreator
     public Problem(
-            @JsonProperty("node-id") ArrayList<String> nodeId,
-            @JsonProperty("edge-id") ArrayList<String> edgeId,
+            @JsonProperty("node_id") ArrayList<String> nodeId,
+            @JsonProperty("edge_id") ArrayList<String> edgeId,
             @JsonProperty("node") HashMap<String, NodeData> node,
             @JsonProperty("edge") HashMap<String, EdgeData> edge) {
         this.edge = edge;

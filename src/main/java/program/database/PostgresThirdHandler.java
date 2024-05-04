@@ -79,7 +79,8 @@ public class PostgresThirdHandler {
 
         try {
             PreparedStatement prSt = connection.prepareStatement("INSERT INTO nodes (id, model_name," +
-                    " nodetype, systemtype, position, selected, equipment) VALUES(?, ?, ?, ?, ?::jsonb, ?, ?::jsonb);");
+                    " node_type, system_type, position, selected, equipment, grouped, group_name)" +
+                    " VALUES(?, ?, ?, ?, ?::jsonb, ?, ?::jsonb, ?, ?);");
             position = objectMapper.writeValueAsString(node.getPosition());
             equipment = objectMapper.writeValueAsString(node.getData().getEquipment());
 
@@ -90,6 +91,8 @@ public class PostgresThirdHandler {
             prSt.setString(5, position);
             prSt.setBoolean(6, node.isSelected());
             prSt.setString(7, equipment);
+            prSt.setString(8, node.getData().getGrouped());
+            prSt.setString(9, node.getData().getGroupName());
             updatedRows = prSt.executeUpdate();
         } catch (SQLException | JsonProcessingException e) {
             throw new RuntimeException(e);
@@ -105,7 +108,7 @@ public class PostgresThirdHandler {
 
         try {
             PreparedStatement prSt = connection.prepareStatement("INSERT INTO edges (id, model_name, source, target," +
-                    " systemtype, length, selected, equipment) VALUES(?, ?, ?, ?, ?, ?, ?, ?::jsonb);");
+                    " system_type, length, selected, equipment) VALUES(?, ?, ?, ?, ?, ?, ?, ?::jsonb);");
             equipment = objectMapper.writeValueAsString(edge.getData().getEquipment());
 
             prSt.setString(1, edge.getData().getId());
@@ -146,12 +149,14 @@ public class PostgresThirdHandler {
                 ArrayList<Equipment> equipment = objectMapper.readValue(rs.getString("equipment"), javaType);
                 Data data = new Data(
                         rs.getString("id"),
-                        rs.getString("nodetype"),
+                        rs.getString("node_type"),
                         null,
                         null,
-                        rs.getString("systemtype"),
+                        rs.getString("system_type"),
                         0,
-                        equipment
+                        equipment,
+                        rs.getString("group_name"),
+                        rs.getString("grouped")
                 );
                 nodes.add(new Node(
                         data,
@@ -185,9 +190,11 @@ public class PostgresThirdHandler {
                         null,
                         rs.getString("source"),
                         rs.getString("target"),
-                        rs.getString("systemtype"),
+                        rs.getString("system_type"),
                         rs.getInt("length"),
-                        equipment
+                        equipment,
+                        "",
+                        "false"
                 );
                 edges.add(new Edge(
                         data,
@@ -346,30 +353,4 @@ public class PostgresThirdHandler {
         return  updatedRows;
     }
 
-//    public void deleteNode(int id) {
-//        try {
-//            PreparedStatement st = connection.prepareStatement("");
-//            st.execute();
-//        } catch (SQLException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
-//
-//    public void deleteEdge(Edge edge) {
-//        try {
-//            PreparedStatement st = connection.prepareStatement("");
-//            st.execute();
-//        } catch (SQLException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
-//
-//    public void deleteEquipment(int id) {
-//        try {
-//            PreparedStatement st = connection.prepareStatement("");
-//            st.execute();
-//        } catch (SQLException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
 }

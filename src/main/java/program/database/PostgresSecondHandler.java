@@ -12,7 +12,7 @@ public class PostgresSecondHandler {
     private Connection connection;
     private static volatile PostgresSecondHandler INSTANCE;
 
-    private PostgresSecondHandler(){
+    private PostgresSecondHandler() {
         try {
             this.connection = DriverManager.getConnection(
                     Constant.SECOND_CLIENT_URL, Constant.SECOND_CLIENT_USER, Constant.SECOND_CLIENT_PASSWORD);
@@ -42,8 +42,8 @@ public class PostgresSecondHandler {
     public ArrayList<Line> readLines() {
         ArrayList<Line> list = new ArrayList<>();
 
-        try(Statement st = connection.createStatement();
-            ResultSet rs = st.executeQuery("SELECT * FROM Lines;")){
+        try (Statement st = connection.createStatement();
+             ResultSet rs = st.executeQuery("SELECT * FROM Lines;")) {
 
             while (rs.next()) {
                 list.add(new Line(
@@ -65,7 +65,7 @@ public class PostgresSecondHandler {
     public ArrayList<Source> readSources() {
         ArrayList<Source> list = new ArrayList<>();
         try (Statement st = connection.createStatement();
-            ResultSet rs = st.executeQuery("SELECT * FROM Sources;")) {
+             ResultSet rs = st.executeQuery("SELECT * FROM Sources;")) {
 
             while (rs.next()) {
                 list.add(new Source(
@@ -75,7 +75,8 @@ public class PostgresSecondHandler {
                         rs.getInt("max_gen"),
                         rs.getInt("min_gen"),
                         rs.getFloat("price"),
-                        rs.getFloat("cost")
+                        rs.getFloat("cost"),
+                        rs.getFloat("efficiency")
                 ));
             }
 
@@ -88,7 +89,7 @@ public class PostgresSecondHandler {
     public ArrayList<Consumer> readConsumers() {
         ArrayList<Consumer> list = new ArrayList<>();
         try (Statement st = connection.createStatement();
-            ResultSet rs = st.executeQuery("SELECT * FROM Consumers;")) {
+             ResultSet rs = st.executeQuery("SELECT * FROM Consumers;")) {
 
             while (rs.next()) {
                 list.add(new Consumer(

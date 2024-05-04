@@ -24,8 +24,8 @@ var addEdgeOn,
   delModeOn = false;
 var nodeType,
   systemType = null;
-var nodeId = 10;
-var edgeId = 10;
+var nodeId = 0;
+var edgeId;
 var clickCount = 0;
 var toolIsSelected = false;
 var firstNodeSelected,
@@ -43,21 +43,37 @@ create.addEventListener("click", async () => {
   modelName = prompt("Введите название модели:", "Модель");
   if (modelName) {
     alert("Вы ввели: " + modelName);
+    setModeValue(false, false, false, false);
+    cy = await initializeEmptyGraph(container);
+    initializeGraphMethods(cy);
   } else {
     alert("Ввод отменен");
   }
-  setModeValue(false, false, false, false);
-  cy = await initializeEmptyGraph(container);
-  initializeGraphMethods(cy);
 });
 
 uploadFromPc.addEventListener("change", async function (e) {
   var file = e.target.files[0];
   modelName = file.name;
   var url = URL.createObjectURL(file);
-  setModeValue(false, false, false, false);
   cy = await initializeGraph(new Request(url), container);
   initializeGraphMethods(cy);
+  setModeValue(false, false, false, false);
+  // var nodesArray = cy.nodes().toArray();
+  // var nodeWithMaxId = null;
+  // var maxIdValue = -Infinity;
+
+  // nodesArray.forEach(function (node) {
+  //   var idValue = parseInt(node.id().replace(/[^\d]/g, ""), 10);
+
+  //   if (idValue > maxIdValue) {
+  //     maxIdValue = idValue;
+  //     nodeWithMaxId = node;
+  //   }
+  // });
+  // nodeId = parseInt(nodeWithMaxId.id().replace(/[^\d]/g, ""), 10);
+  // console.log(nodeId);
+  modelName = removeExtension(modelName);
+  alert("Вы открыли модель с названием " + modelName);
 });
 
 uploadFromDb.addEventListener("click", async () => {
@@ -70,6 +86,20 @@ uploadFromDb.addEventListener("click", async () => {
   let url = `http://localhost:8080/app/api/get/model?name=${modelName}`;
   cy = await initializeGraph(new Request(url), container);
   initializeGraphMethods(cy);
+  // var nodesArray = cy.nodes().toArray();
+  // var nodeWithMaxId = null;
+  // var maxIdValue = -Infinity;
+
+  // nodesArray.forEach(function (node) {
+  //   var idValue = parseInt(node.id().replace(/[^\d]/g, ""), 10);
+
+  //   if (idValue > maxIdValue) {
+  //     maxIdValue = idValue;
+  //     nodeWithMaxId = node;
+  //   }
+  // });
+  // nodeId = parseInt(nodeWithMaxId.id().replace(/[^\d]/g, ""), 10);
+  // console.log(nodeId);
   setModeValue(false, false, false, false);
 });
 
@@ -122,14 +152,14 @@ hideCheckboxes.forEach((checkbox) => {
     if (cy !== null) {
       if (this.checked) {
         if (this.id === "checkbox1") {
-          cy.nodes('node[systemtype = "heat"]').hide();
-          cy.edges('edge[systemtype = "heat"]').hide();
+          cy.nodes('node[system_type = "heat"]').hide();
+          cy.edges('edge[system_type = "heat"]').hide();
         } else if (this.id === "checkbox2") {
-          cy.nodes('node[systemtype = "power"]').hide();
-          cy.edges('edge[systemtype = "power"]').hide();
+          cy.nodes('node[system_type = "power"]').hide();
+          cy.edges('edge[system_type = "power"]').hide();
         } else if (this.id === "checkbox3") {
-          cy.nodes('node[systemtype = "fuel"]').hide();
-          cy.edges('edge[systemtype = "fuel"]').hide();
+          cy.nodes('node[system_type = "fuel"]').hide();
+          cy.edges('edge[system_type = "fuel"]').hide();
         }
       } else {
         cy.elements(":hidden").show();
@@ -251,6 +281,22 @@ function downloadGraph(fileName) {
   }
 }
 //функции для графа
+// function getMaxNodeId() {
+//   var nodesArray = cy.nodes().toArray();
+//   var nodeWithMaxId = null;
+//   var maxIdValue = -Infinity;
+
+//   nodesArray.forEach(function (node) {
+//     var idValue = parseInt(node.id().replace(/[^\d]/g, ""), 10);
+
+//     if (idValue > maxIdValue) {
+//       maxIdValue = idValue;
+//       nodeWithMaxId = node;
+//     }
+//   });
+//   var maxId = parseInt(nodeWithMaxId.id().replace(/[^\d]/g, ""), 10);
+//   return maxId;
+// }
 function initializeGraph(request, container) {
   return new Promise((resolve, reject) => {
     Promise.all([
@@ -300,7 +346,23 @@ function initializeEmptyGraph(container) {
 function initializeGraphMethods(cy) {
   cy.zoom(1.25);
   cy.pan({ x: 270, y: 450 });
-  canvas = document.querySelector("canvas");
+ 
+  var nodesArray = cy.nodes().toArray();
+  var nodeWithMaxId = null;
+  var maxIdValue = -Infinity;
+
+  nodesArray.forEach(function (node) {
+    var idValue = parseInt(node.id().replace(/[^\d]/g, ""), 10);
+
+    if (idValue > maxIdValue) {
+      maxIdValue = idValue;
+      nodeWithMaxId = node;
+    }
+  });
+  if (nodeWithMaxId !== null) {
+    nodeId = parseInt(nodeWithMaxId.id().replace(/[^\d]/g, ""), 10);
+    console.log(nodeId);
+  }
 
   // Обработка нажатий на элементы графа
   cy.on("click", "node", function (event) {
@@ -308,7 +370,7 @@ function initializeGraphMethods(cy) {
     var node = event.target;
     var id = node.data("id");
     var equipment = node.data("equipment");
-    systemType = node.data("systemtype");
+    systemType = node.data("system_type");
     addEdgeToGraph(id);
 
     if (editModeOn) {
@@ -325,6 +387,20 @@ function initializeGraphMethods(cy) {
       });
     } else if (delModeOn) {
       node.remove();
+      var nodesArray = cy.nodes().toArray();
+      var nodeWithMaxId = null;
+      var maxIdValue = -Infinity;
+
+      nodesArray.forEach(function (node) {
+        var idValue = parseInt(node.id().replace(/[^\d]/g, ""), 10);
+
+        if (idValue > maxIdValue) {
+          maxIdValue = idValue;
+          nodeWithMaxId = node;
+        }
+      });
+      nodeId = parseInt(nodeWithMaxId.id().replace(/[^\d]/g, ""), 10);
+      console.log(nodeId);
     }
   });
 
@@ -333,7 +409,7 @@ function initializeGraphMethods(cy) {
     var edge = event.target;
     var id = edge.data("id");
     var equipment = edge.data("equipment");
-    systemType = edge.data("systemtype");
+    systemType = edge.data("system_type");
 
     if (editModeOn) {
       setChecked(systemType, editCheckboxes);
@@ -347,23 +423,27 @@ function initializeGraphMethods(cy) {
     }
   });
 
-  canvas.addEventListener("click", (e) => {
-    addNodeToGraph(e);
-    toolIsSelected = false;
+  cy.on("click", function (event) {
+    if (event && event.position && addNodeOn) {
+      var pos = event.position;
+      addNodeToGraph(pos);
+      toolIsSelected = false;
+    }
   });
 }
-function addNodeToGraph(e) {
+function addNodeToGraph(pos) {
   if (addNodeOn) {
     var node = [
       {
         data: {
           id: `n${nodeId++}`,
-          nodetype: nodeType,
-          systemtype: "heat",
-          length: 0,
+          node_type: nodeType,
+          system_type: "heat",
+          group: "",
+          group_name: "",
           equipment: [
             {
-              name: `node ${nodeId}`,
+              id: 0,
               price: 0.0,
               throughput: 0,
               resistance: 0,
@@ -371,10 +451,12 @@ function addNodeToGraph(e) {
               max_gen: 0,
               min_gen: 0,
               load: 0,
+              installed: true,
+              efficiency: 1,
             },
           ],
         },
-        position: { x: e.offsetX - 270, y: e.offsetY - 450 },
+        position: { x: pos.x, y: pos.y },
       },
     ];
     cy.add(node);
@@ -390,10 +472,13 @@ function addEdgeToGraph(id) {
       var edge = [
         {
           data: {
-            id: `e${firstNodeSelected}${secondNodeSelected}`,
+            id: `e${parseInt(
+              firstNodeSelected.replace(/[^\d]/g, ""),
+              10
+            )}${parseInt(secondNodeSelected.replace(/[^\d]/g, ""), 10)}`,
             source: firstNodeSelected,
             target: secondNodeSelected,
-            systemtype: "heat",
+            system_type: "heat",
             length: 20,
             equipment: [
               {
@@ -423,7 +508,7 @@ function getProblem(cy) {
     return node.id();
   });
 
-  var data = { "node-id": [], "edge-id": [], node: {}, edge: {} };
+  var data = { node_id: [], edge_id: [], node: {}, edge: {} };
 
   nodeIds.forEach((nodeId) => {
     var node = cy.$("#" + nodeId);
@@ -441,12 +526,13 @@ function getProblem(cy) {
 
       edgeId = edge.id();
       edgeIdDuplicate = edgeId + "d";
-
-      if (nodeId === sourceNodeId) {
+      nodeIdCopy = nodeId;
+      if (!data["edge_id"].includes(edgeId)) {
         let eq = edge.data("equipment");
-        data["edge-id"].push(edgeId);
+        data["edge_id"].push(edgeId);
+
         data["edge"][edgeId] = {
-          "system-type": edge.data("systemtype"),
+          system_type: edge.data("system_type"),
           throughput: eq[0].throughput,
           resistance: eq[0].resistance,
           cost: eq[0].cost,
@@ -455,77 +541,148 @@ function getProblem(cy) {
           target: targetNodeId,
         };
       }
-    });
 
-    nodeIdCopy = nodeId;
-    edgeIdCopy = edgeId;
+      edgeIdCopy = edgeId;
 
-    equipment.forEach((item) => {
-      if (item.installed === false) {
-        data["node-id"].push(nodeIdCopy);
-        data["node"][nodeIdCopy] = {
-          "system-type": node.data("systemtype"),
-          "node-type": node.data("nodetype"),
-          price: item.price,
-          cost: item.cost,
-          "max-generation": item.max_gen,
-          "min-generation": item.min_gen,
-          load: item.load,
-          installed: item.installed,
-        };
+      equipment.forEach((item) => {
+        if (item.installed === false) {
+          data["node_id"].push(nodeIdCopy);
+          data["node"][nodeIdCopy] = {
+            system_type: node.data("system_type"),
+            node_type: node.data("node_type"),
+            price: item.price,
+            cost: item.cost,
+            "max-generation": item.max_gen,
+            "min-generation": item.min_gen,
+            load: item.load,
+            installed: item.installed,
+            efficiency: item.efficiency,
+          };
 
-        // console.log(data["edge"][edgeId]);
-        // console.log(edgeId);
-        // console.log(edgeIdCopy);
-        console.log(data["node-id"], data["edge-id"]);
-        if (!data["edge-id"].includes(edgeIdCopy)) {
-          data["edge-id"].push(edgeIdCopy);
-          data["edge"][edgeIdCopy] = JSON.parse(
-            JSON.stringify(data["edge"][edgeId])
-          ); //сделали глубокую копию
-          data["edge"][edgeIdCopy].source = nodeIdCopy;
+          if (!data["edge_id"].includes(edgeIdCopy)) {
+            data["edge_id"].push(edgeIdCopy);
+            data["edge"][edgeIdCopy] = JSON.parse(
+              JSON.stringify(data["edge"][edgeId])
+            ); //сделали глубокую копию
+            data["edge"][edgeIdCopy].source = nodeIdCopy;
+          }
+          data["edge_id"].push(edgeIdDuplicate);
+          data["edge"][edgeIdDuplicate] = data["edge"][edgeIdCopy];
+
+          nodeIdCopy += "c";
+          edgeIdCopy += "c";
+          edgeIdDuplicate = edgeIdCopy + "d";
+          flag = true;
         }
-        data["edge-id"].push(edgeIdDuplicate);
-        data["edge"][edgeIdDuplicate] = data["edge"][edgeIdCopy];
-
-        nodeIdCopy += "c";
-        edgeIdCopy += "c";
-        edgeIdDuplicate = edgeIdCopy + "d";
-        flag = true;
-      }
+      });
     });
 
     if (!flag) {
-      data["node-id"].push(nodeId);
+      data["node_id"].push(nodeId);
       data["node"][nodeId] = {
-        "system-type": node.data("systemtype"),
-        "node-type": node.data("nodetype"),
+        system_type: node.data("system_type"),
+        node_type: node.data("node_type"),
         price: equipment[0].price,
         cost: equipment[0].cost,
         "max-generation": equipment[0].max_gen,
         "min-generation": equipment[0].min_gen,
         load: equipment[0].load,
         installed: equipment[0].installed,
+        efficiency: equipment[0].efficiency,
       };
     }
   });
 
-  data["node-id"].push("lim");
-  data["edge-id"].push("sign", "lim");
-
+  data["node_id"].push("lim");
+  data["edge_id"].push("sign", "lim");
+  console.log(data["node_id"]);
+  console.log(data["edge_id"]);
+  console.log(data);
   return data;
 }
 //конец
 
-const scrollableList = document.getElementById("scrollableList");
+//как-то оптимизировать этот код
+const scrollableList1 = document.getElementById("scrollableList1");
+loadDataFromServer(getConsumerUrl).then((data) => {
+  data.forEach((item) => {
+    // console.log(item);
+    const listItem = document.createElement("div");
+    listItem.style.fontSize = "10px";
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.name = "itemCheckbox";
+    checkbox.className = "group5";
+    checkbox.value = item.id;
+    checkbox.id = `${item.id}`;
+    // console.log(checkbox.id);
+
+    listItem.appendChild(checkbox);
+    listItem.appendChild(document.createElement("br"));
+
+    const nameText = document.createTextNode(`Наименование: ${item.name}`);
+    listItem.appendChild(nameText);
+    listItem.appendChild(document.createElement("br"));
+
+    const loadText = document.createTextNode(`Потребление: ${item.load}`);
+    listItem.appendChild(loadText);
+
+    scrollableList1.appendChild(listItem);
+  });
+});
+const scrollableList2 = document.getElementById("scrollableList2");
 loadDataFromServer(getSourceUrl).then((data) => {
   data.forEach((item) => {
     // console.log(item);
     const listItem = document.createElement("div");
+    listItem.style.fontSize = "10px";
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.name = "itemCheckbox";
-    checkbox.className = "group3";
+    checkbox.className = "group6";
+    checkbox.value = item.id;
+    checkbox.id = `${item.id}`;
+    // console.log(checkbox.id);
+
+    listItem.appendChild(checkbox);
+    listItem.appendChild(document.createElement("br"));
+
+    const nameText = document.createTextNode(`Наименование: ${item.name}`);
+    listItem.appendChild(nameText);
+    listItem.appendChild(document.createElement("br"));
+
+    const maxGenText = document.createTextNode(
+      `Генерация(max): ${item.max_gen}`
+    );
+    listItem.appendChild(maxGenText);
+    listItem.appendChild(document.createElement("br"));
+
+    const minGenText = document.createTextNode(
+      `Генерация(min): ${item.min_gen}`
+    );
+    listItem.appendChild(minGenText);
+    listItem.appendChild(document.createElement("br"));
+
+    const priceText = document.createTextNode(`За ед. энерг: ${item.price}`);
+    listItem.appendChild(priceText);
+    listItem.appendChild(document.createElement("br"));
+
+    const costText = document.createTextNode(`Кап. затраты: ${item.cost}`);
+    listItem.appendChild(costText);
+
+    scrollableList2.appendChild(listItem);
+  });
+});
+const scrollableList3 = document.getElementById("scrollableList3");
+loadDataFromServer(getLinesUrl).then((data) => {
+  data.forEach((item) => {
+    // console.log(item);
+    const listItem = document.createElement("div");
+    listItem.style.fontSize = "10px";
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.name = "itemCheckbox";
+    checkbox.className = "group6";
     checkbox.value = item.id;
     checkbox.id = `${item.id}`;
     // console.log(checkbox.id);
@@ -552,10 +709,11 @@ loadDataFromServer(getSourceUrl).then((data) => {
     const costText = document.createTextNode(`Кап. затраты: ${item.cost}`);
     listItem.appendChild(costText);
 
-    scrollableList.appendChild(listItem);
+    scrollableList3.appendChild(listItem);
   });
 });
-const checkedCheckboxes = document.querySelectorAll(".group3");
+
+const checkedCheckboxes = document.querySelectorAll(".group5");
 function displaySelectedValues() {
   let selectedValues = [];
 

@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class EdgeData {
-    @JsonProperty("system-type")
+    @JsonProperty("system_type")
     private String systemType;
     @JsonProperty("throughput")
     private int throughput;
@@ -29,7 +29,7 @@ public class EdgeData {
 
     @JsonCreator
     public EdgeData(
-            @JsonProperty("system-type") String systemType,
+            @JsonProperty("system_type") String systemType,
             @JsonProperty("throughput") int throughput,
             @JsonProperty("resistance") int resistance,
             @JsonProperty("cost") int cost,

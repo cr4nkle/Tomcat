@@ -45,6 +45,7 @@ public class LinearStatement {
                         double v = 0;
                         NodeData n = node.get(f);
                         String nodeType = n.getNodeType();
+                        float h = 1.0f;
 
                         switch (s) {
                             case "sign":
@@ -62,7 +63,10 @@ public class LinearStatement {
                                 if (isSource) {
                                     v = s.endsWith("d") ? -n.getMaxGen() : 1;
                                 } else if (isTarget) {
-                                    v = s.endsWith("d") ? 0 : -1;
+                                    if (nodeType.equals("source"))
+                                        h = n.getEfficiency();
+                                    System.out.println(n.getEfficiency());
+                                    v = s.endsWith("d") ? 0 : -1 * h;
                                 }
                                 row.add(v);
                                 break;

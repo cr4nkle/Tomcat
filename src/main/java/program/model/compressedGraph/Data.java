@@ -12,29 +12,36 @@ import java.util.ArrayList;
 public class Data {
     @JsonProperty("id")
     private String id;
-    @JsonProperty("nodetype")
+    @JsonProperty("node_type")
     private String nodeType;
     @JsonProperty("source")
     private String source;
     @JsonProperty("target")
     private String target;
-    @JsonProperty("systemtype")
+    @JsonProperty("system_type")
     private String systemType;
     @JsonProperty("length")
     private int length;
     @JsonProperty("equipment")
     private ArrayList<Equipment> equipment;
+    @JsonProperty("grouped")
+    private String grouped;
+    @JsonProperty("group_name")
+    private String groupName;
 
-    public Data () {}
+    public Data() {
+    }
 
     @JsonCreator
-    public Data (@JsonProperty("id") String id,
-                 @JsonProperty("nodetype") String nodeType,
-                 @JsonProperty("source") String source,
-                 @JsonProperty("target") String target,
-                 @JsonProperty("systemtype") String systemType,
-                 @JsonProperty("length") int length,
-                 @JsonProperty("equipment") ArrayList<Equipment> equipment) {
+    public Data(@JsonProperty("id") String id,
+                @JsonProperty("node_type") String nodeType,
+                @JsonProperty("source") String source,
+                @JsonProperty("target") String target,
+                @JsonProperty("system_type") String systemType,
+                @JsonProperty("length") int length,
+                @JsonProperty("equipment") ArrayList<Equipment> equipment,
+                @JsonProperty("group_name") String groupName,
+                @JsonProperty("grouped") String grouped) {
         this.id = id;
         this.nodeType = nodeType;
         this.source = source;
@@ -42,6 +49,8 @@ public class Data {
         this.systemType = systemType;
         this.length = length;
         this.equipment = equipment;
+        this.grouped = grouped;
+        this.groupName = groupName;
     }
 
     public void setId(String id) {
@@ -98,5 +107,21 @@ public class Data {
 
     public void setLength(int length) {
         this.length = length;
+    }
+
+    public String getGrouped() {
+        return grouped;
+    }
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGrouped(String grouped) {
+        this.grouped = grouped;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
     }
 }

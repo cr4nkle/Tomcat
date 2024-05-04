@@ -8,22 +8,24 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class NodeData {
-    @JsonProperty("system-type")
+    @JsonProperty("system_type")
     private String systemType;
-    @JsonProperty("node-type")
+    @JsonProperty("node_type")
     private String nodeType;
     @JsonProperty("price")
     private float price;
     @JsonProperty("cost")
     private int cost;
-    @JsonProperty("max-generation")
+    @JsonProperty("max_generation")
     private int maxGen;
-    @JsonProperty("min-generation")
+    @JsonProperty("min_generation")
     private int minGen;
     @JsonProperty("load")
     private int load;
     @JsonProperty("installed")
     private boolean installed;
+    @JsonProperty("efficiency")
+    private float efficiency;
 
     public NodeData() {
 
@@ -31,14 +33,15 @@ public class NodeData {
 
     @JsonCreator
     public NodeData(
-            @JsonProperty("node-type") String nodeType,
+            @JsonProperty("node_type") String nodeType,
             @JsonProperty("price") int price,
             @JsonProperty("cost") int cost,
-            @JsonProperty("max-generation") int maxGen,
-            @JsonProperty("min-generation") int minGen,
+            @JsonProperty("max_generation") int maxGen,
+            @JsonProperty("min_generation") int minGen,
             @JsonProperty("load") int load,
-            @JsonProperty("system-type") String systemType,
-            @JsonProperty("installed") boolean installed) {
+            @JsonProperty("system_type") String systemType,
+            @JsonProperty("installed") boolean installed,
+            @JsonProperty("efficiency") float efficiency) {
         this.cost = cost;
         this.load = load;
         this.nodeType = nodeType;
@@ -47,6 +50,7 @@ public class NodeData {
         this.price = price;
         this.systemType = systemType;
         this.installed = installed;
+        this.efficiency = efficiency;
     }
 
     public int getCost() {
@@ -111,6 +115,14 @@ public class NodeData {
 
     public void setInstalled(boolean installed) {
         this.installed = installed;
+    }
+
+    public float getEfficiency() {
+        return efficiency;
+    }
+
+    public void setEfficiency(float efficiency) {
+        this.efficiency = efficiency;
     }
 
     @Override

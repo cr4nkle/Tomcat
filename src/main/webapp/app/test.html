@@ -16,7 +16,11 @@
         border-right: 1px solid #000;
       }
       .right-column {
-        width: 95%;
+        width: 20%;
+        padding: 10px;
+      }
+      .center-column {
+        width: 70%;
         padding: 10px;
       }
       .options {
@@ -32,26 +36,32 @@
       #upload-from-pc {
         display: none;
       }
-      .right-column .__________cytoscape_container {
+      .center-column .__________cytoscape_container {
         height: 100%;
         width: 100%;
         left: 0;
         top: 0;
       }
       #scrollableList {
-        height: 200px;
+        height: 150px;
         overflow-y: auto;
         border: 1px solid #000;
         padding: 10px;
+        font-size: 10px; 
       }
+
       #scrollableList div {
         margin-bottom: 10px;
         padding: 5px;
         border-bottom: 1px solid #ccc;
+        font-size: 10px; 
       }
+
       #scrollableList input[type="checkbox"] {
         margin-right: 5px;
+        font-size: 10px; 
       }
+
       .checkboxes {
         /* display: none; */
         width: 80px;
@@ -69,6 +79,10 @@
       input[type="checkbox"] + label {
         font-size: 10px;
         text-align: center;
+      }
+      .row {
+        display: flex;
+        margin-bottom: 20px; /* Добавьте отступ между строками */
       }
     </style>
   </head>
@@ -139,23 +153,59 @@
           </li>
         </ul>
       </section>
-      <section class="right-column">
+      <section class="center-column">
         <div id="cy"></div>
       </section>
-      <div class="checkboxes">
-        <input type="checkbox" class="group2" id="heat" />
-        <label for="heat">Тепл</label><br />
-        <input type="checkbox" class="group2" id="power" />
-        <label for="power">Эл</label><br />
-        <input type="checkbox" class="group2" id="cold" />
-        <label for="cold">Вод</label><br />
-        <input type="checkbox" class="group2" id="fuel" />
-        <label for="fuel">Топл</label><br />
-      </div>
-      <div
-        id="scrollableList"
-        style="height: 100px; overflow-y: auto; border: 1px solid #000"
-      ></div>
+      <section class="right-column">
+        <div class="row">
+          <div class="checkboxes">
+            <input type="checkbox" class="group2" id="heat" />
+            <label for="heat">Тепл</label><br />
+            <input type="checkbox" class="group2" id="power" />
+            <label for="power">Эл</label><br />
+            <input type="checkbox" class="group2" id="cold" />
+            <label for="cold">Вод</label><br />
+            <input type="checkbox" class="group2" id="fuel" />
+            <label for="fuel">Топл</label><br />
+          </div>
+          <div
+            id="scrollableList1"
+            style="height: 100px; overflow-y: auto; border: 1px solid #000"
+          ></div>
+        </div>
+        <div class="row">
+          <div class="checkboxes">
+            <input type="checkbox" class="group3" id="heat" />
+            <label for="heat">Тепл</label><br />
+            <input type="checkbox" class="group3" id="power" />
+            <label for="power">Эл</label><br />
+            <input type="checkbox" class="group3" id="cold" />
+            <label for="cold">Вод</label><br />
+            <input type="checkbox" class="group3" id="fuel" />
+            <label for="fuel">Топл</label><br />
+          </div>
+          <div
+            id="scrollableList2"
+            style="height: 100px; overflow-y: auto; border: 1px solid #000"
+          ></div>
+        </div>
+        <div class="row">
+          <div class="checkboxes">
+            <input type="checkbox" class="group4" id="heat" />
+            <label for="heat">Тепл</label><br />
+            <input type="checkbox" class="group4" id="power" />
+            <label for="power">Эл</label><br />
+            <input type="checkbox" class="group4" id="cold" />
+            <label for="cold">Вод</label><br />
+            <input type="checkbox" class="group4" id="fuel" />
+            <label for="fuel">Топл</label><br />
+          </div>
+          <div
+            id="scrollableList3"
+            {# style="height: 100px; overflow-y: auto; border: 1px solid #000" #}
+          ></div>
+        </div>
+      </section>
     </div>
     <script src="scripts/test.js"></script>
   </body>

@@ -17,6 +17,7 @@ public class Source {
     private int minGeneration;
     private float price;
     private float cost;
+    private float efficiency;
 
     public Source () {}
 
@@ -27,7 +28,8 @@ public class Source {
                   @JsonProperty("max_gen") int maxGeneration,
                   @JsonProperty("min_gen") int minGeneration,
                   float price,
-                  float cost){
+                  float cost,
+                  float efficiency){
         this.id = id;
         this.type = type;
         this.name = name;
@@ -35,6 +37,7 @@ public class Source {
         this.minGeneration = minGeneration;
         this.price = price;
         this.cost = cost;
+        this.efficiency = efficiency;
     }
 
     public int getId() {
@@ -91,5 +94,13 @@ public class Source {
 
     public void setPrice(float price) {
         this.price = price;
+    }
+
+    public void setEfficiency(float efficiency) {
+        this.efficiency = efficiency;
+    }
+
+    public float getEfficiency() {
+        return efficiency;
     }
 }

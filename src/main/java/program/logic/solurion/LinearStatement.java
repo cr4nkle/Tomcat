@@ -5,6 +5,8 @@ import program.model.compressedGraph.NodeData;
 import program.model.mathStatement.MathStatement;
 import program.model.mathStatement.Problem;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
@@ -13,6 +15,7 @@ import java.util.concurrent.Executors;
 
 public class LinearStatement {
     public static MathStatement getLinearStatement(Problem problem) {
+        System.out.println(problem.toString());
         ArrayList<String> first = problem.getNodeId();
         ArrayList<String> second = problem.getEdgeId();
         ArrayList<String> firstCopy = new ArrayList<>(first);
@@ -34,9 +37,7 @@ public class LinearStatement {
 
         goal.add(0.0);//добавляем 0, чтобы выровнять нумерацию в решателе
 
-        ExecutorService executor = Executors.newFixedThreadPool(2);
-
-        executor.submit(() -> {
+        CompletableFuture<Void> task1 = CompletableFuture.runAsync(() -> {
             first.forEach(f -> {
                 ArrayList<Double> row = new ArrayList<>();
                 row.add(0.0);
@@ -62,11 +63,18 @@ public class LinearStatement {
                                 boolean isTarget = f.equals(e.getTarget());
                                 if (isSource) {
                                     v = s.endsWith("d") ? -n.getMaxGen() : 1;
+                                    System.out.println(n.getMaxGen());
                                 } else if (isTarget) {
-                                    if (nodeType.equals("source"))
+                                    if (nodeType.equals("source")) {
                                         h = n.getEfficiency();
-                                    System.out.println(n.getEfficiency());
-                                    v = s.endsWith("d") ? 0 : -1 * h;
+                                        BigDecimal bd = new BigDecimal(Float.toString(-1 * h));
+                                        BigDecimal rounded = bd.setScale(2, RoundingMode.HALF_UP);
+                                        double doubleValue = rounded.doubleValue();
+                                        v = s.endsWith("d") ? 0 : doubleValue;
+                                    } else {
+                                        v = s.endsWith("d") ? 0 : -1;
+                                    }
+
                                 }
                                 row.add(v);
                                 break;
@@ -89,7 +97,7 @@ public class LinearStatement {
             });
         });
 
-        executor.submit(() -> {
+        CompletableFuture<Void> task2 = CompletableFuture.runAsync(() -> {
             secondCopy.forEach(s -> {
                 firstCopy.forEach(t -> {
                     NodeData n = node.get(t);
@@ -119,7 +127,9 @@ public class LinearStatement {
                 });
             });
         });
-        executor.shutdown();
+
+        task1.join();
+        task2.join();
 
         return new MathStatement(lim, max, min, goal, matrix, sign, type);
     }

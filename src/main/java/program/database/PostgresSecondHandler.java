@@ -39,11 +39,13 @@ public class PostgresSecondHandler {
         }
     }
 
-    public ArrayList<Line> readLines() {
+    public ArrayList<Line> readLines(String type) {
         ArrayList<Line> list = new ArrayList<>();
 
-        try (Statement st = connection.createStatement();
-             ResultSet rs = st.executeQuery("SELECT * FROM Lines;")) {
+        try {
+            PreparedStatement st = connection.prepareStatement("SELECT * FROM Lines WHERE type = ?;");
+            st.setString(1, type);
+            ResultSet rs = st.executeQuery();
 
             while (rs.next()) {
                 list.add(new Line(
@@ -62,10 +64,12 @@ public class PostgresSecondHandler {
         return list;
     }
 
-    public ArrayList<Source> readSources() {
+    public ArrayList<Source> readSources(String type) {
         ArrayList<Source> list = new ArrayList<>();
-        try (Statement st = connection.createStatement();
-             ResultSet rs = st.executeQuery("SELECT * FROM Sources;")) {
+        try {
+            PreparedStatement st = connection.prepareStatement("SELECT * FROM Sources WHERE type = ?;");
+            st.setString(1, type);
+            ResultSet rs = st.executeQuery();
 
             while (rs.next()) {
                 list.add(new Source(
@@ -86,10 +90,12 @@ public class PostgresSecondHandler {
         return list;
     }
 
-    public ArrayList<Consumer> readConsumers() {
+    public ArrayList<Consumer> readConsumers(String type) {
         ArrayList<Consumer> list = new ArrayList<>();
-        try (Statement st = connection.createStatement();
-             ResultSet rs = st.executeQuery("SELECT * FROM Consumers;")) {
+        try {
+            PreparedStatement st = connection.prepareStatement("SELECT * FROM Consumers WHERE type = ?;");
+            st.setString(1, type);
+            ResultSet rs = st.executeQuery();
 
             while (rs.next()) {
                 list.add(new Consumer(

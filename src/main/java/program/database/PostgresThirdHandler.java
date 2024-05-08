@@ -47,11 +47,17 @@ public class PostgresThirdHandler {
     public int insertModel(Graph graph) {
         AtomicInteger updatedRows = new AtomicInteger();
         String name = graph.getName();
-        ArrayList<Node> nodes = graph.getElements().getNodes();
-        ArrayList<Edge> edges = graph.getElements().getEdges();
+        ArrayList<Node> nodes = graph.getElement().getNodes();
+        ArrayList<Edge> edges = graph.getElement().getEdges();
+        String[] nodeIds = graph.getNodeIds();
+        String[] edgeIds = graph.getEdgeIds();
 
         try {
-            PreparedStatement prSt = connection.prepareStatement("INSERT INTO model (name) VALUES(?);");
+            deleteExtraNodes(nodeIds, name);
+            deleteExtraEdges(edgeIds, name);
+            PreparedStatement prSt = connection.prepareStatement("INSERT INTO model (name)\n" +
+                    "VALUES (?)\n" +
+                    "ON CONFLICT (name) DO NOTHING;\n");
             prSt.setString(1, name);
             updatedRows.addAndGet(prSt.executeUpdate());
 
@@ -78,9 +84,18 @@ public class PostgresThirdHandler {
         String equipment;
 
         try {
-            PreparedStatement prSt = connection.prepareStatement("INSERT INTO nodes (id, model_name," +
-                    " node_type, system_type, position, selected, equipment, grouped, group_name)" +
-                    " VALUES(?, ?, ?, ?, ?::jsonb, ?, ?::jsonb, ?, ?);");
+            PreparedStatement prSt = connection.prepareStatement(
+                    "INSERT INTO nodes (id, model_name, node_type, system_type," +
+                            " grouped, group_name, position, selected, equipment)\n" +
+                            "VALUES (?, ?, ?, ?, ?, ?, ?::jsonb, ?, ?::jsonb)\n" +
+                            "ON CONFLICT (id, model_name) DO UPDATE\n" +
+                            "SET node_type = EXCLUDED.node_type,\n" +
+                            "    system_type = EXCLUDED.system_type,\n" +
+                            "    grouped = EXCLUDED.grouped,\n" +
+                            "    group_name = EXCLUDED.group_name,\n" +
+                            "    position = EXCLUDED.position,\n" +
+                            "    selected = EXCLUDED.selected,\n" +
+                            "    equipment = EXCLUDED.equipment;\n");
             position = objectMapper.writeValueAsString(node.getPosition());
             equipment = objectMapper.writeValueAsString(node.getData().getEquipment());
 
@@ -88,11 +103,11 @@ public class PostgresThirdHandler {
             prSt.setString(2, name);
             prSt.setString(3, node.getData().getNodeType());
             prSt.setString(4, node.getData().getSystemType());
-            prSt.setString(5, position);
-            prSt.setBoolean(6, node.isSelected());
-            prSt.setString(7, equipment);
-            prSt.setString(8, node.getData().getGrouped());
-            prSt.setString(9, node.getData().getGroupName());
+            prSt.setString(5, node.getData().getGrouped());
+            prSt.setString(6, node.getData().getGroupName());
+            prSt.setString(7, position);
+            prSt.setBoolean(8, node.isSelected());
+            prSt.setString(9, equipment);
             updatedRows = prSt.executeUpdate();
         } catch (SQLException | JsonProcessingException e) {
             throw new RuntimeException(e);
@@ -107,8 +122,16 @@ public class PostgresThirdHandler {
         String equipment;
 
         try {
-            PreparedStatement prSt = connection.prepareStatement("INSERT INTO edges (id, model_name, source, target," +
-                    " system_type, length, selected, equipment) VALUES(?, ?, ?, ?, ?, ?, ?, ?::jsonb);");
+            PreparedStatement prSt = connection.prepareStatement(
+                    "INSERT INTO edges (id, model_name, source, target, system_type, length, selected, equipment)\n" +
+                            "VALUES (?, ?, ?, ?, ?, ?, ?, ?::jsonb)\n" +
+                            "ON CONFLICT (id, model_name) DO UPDATE\n" +
+                            "SET source = EXCLUDED.source,\n" +
+                            "    target = EXCLUDED.target,\n" +
+                            "    system_type = EXCLUDED.system_type,\n" +
+                            "    length = EXCLUDED.length,\n" +
+                            "    selected = EXCLUDED.selected,\n" +
+                            "    equipment = EXCLUDED.equipment;\n");
             equipment = objectMapper.writeValueAsString(edge.getData().getEquipment());
 
             prSt.setString(1, edge.getData().getId());
@@ -130,7 +153,7 @@ public class PostgresThirdHandler {
         ArrayList<Node> nodes = readNodes(name);
         ArrayList<Edge> edges = readEdges(name);
         Element element = new Element(nodes, edges);
-        Graph graph = new Graph(name, element);
+        Graph graph = new Graph(name, element, null, null);
 
         return graph;
     }
@@ -224,6 +247,61 @@ public class PostgresThirdHandler {
         }
 
         return modelName;
+    }
+
+    public int deleteModel(String name) {
+        int updatedRows;
+        try {
+            PreparedStatement prst = connection.prepareStatement("DELETE FROM model WHERE name = ?;");
+            prst.setString(1, name);
+            updatedRows = prst.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return updatedRows;
+    }
+
+    public int deleteExtraEdges(String[] ids, String name) {
+        int updatedRows;
+        String idsList = getIdsList(ids);
+        try {
+            PreparedStatement prst = connection.prepareStatement("DELETE FROM edges\n" +
+                    "WHERE model_name = ? AND id NOT IN (\n" +
+                    idsList +
+                    ");");
+            prst.setString(1, name);
+            updatedRows = prst.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return updatedRows;
+    }
+
+    public int deleteExtraNodes(String[] ids, String name) {
+        int updatedRows;
+        String idsList = getIdsList(ids);
+        try {
+            PreparedStatement prst = connection.prepareStatement("DELETE FROM nodes\n" +
+                    "WHERE model_name = ? AND id NOT IN (\n" +
+                    idsList +
+                    ");");
+            prst.setString(1, name);
+            updatedRows = prst.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return updatedRows;
+    }
+
+    private String getIdsList(String[] ids) {
+        StringBuilder idsList = new StringBuilder();
+        for (int i = 0; i < ids.length; i++) {
+            if (i > 0) {
+                idsList.append(", ");
+            }
+            idsList.append("'").append(ids[i]).append("'");
+        }
+        return idsList.toString();
     }
 
 //    public void updateModel(Graph graph) {
@@ -339,18 +417,6 @@ public class PostgresThirdHandler {
 //        } catch (SQLException e) {
 //            throw new RuntimeException(e);
 //        }
+
 //    }
-
-    public int deleteModel(String name) {
-        int updatedRows;
-        try {
-            PreparedStatement prst = connection.prepareStatement("DELETE FROM model WHERE name = ?;");
-            prst.setString(1, name);
-            updatedRows = prst.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return  updatedRows;
-    }
-
 }

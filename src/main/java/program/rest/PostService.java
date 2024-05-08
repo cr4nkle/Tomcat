@@ -32,10 +32,10 @@ public class PostService {
         PostgresThirdHandler postgresThirdHandler = PostgresThirdHandler.getInstance();
         int updatedRows = postgresThirdHandler.insertModel(graph);
 
-        if (!(updatedRows > 0)) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error processing request").build();
-        } else {
+        if (updatedRows > 0) {
             return Response.status(Response.Status.OK).build();
+        } else {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
     }
 

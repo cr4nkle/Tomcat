@@ -3,6 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      http-equiv="Cache-Control"
+      content="no-cache, no-store, must-revalidate"
+    />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
     <title>Test SPA</title>
     <script src="node_modules/cytoscape/dist/cytoscape.min.js"></script>
     <script src="https://unpkg.com/cytoscape-cola@2.2.3/cytoscape-cola.js"></script>
@@ -47,19 +54,19 @@
         overflow-y: auto;
         border: 1px solid #000;
         padding: 10px;
-        font-size: 10px; 
+        font-size: 10px;
       }
 
       #scrollableList div {
         margin-bottom: 10px;
         padding: 5px;
         border-bottom: 1px solid #ccc;
-        font-size: 10px; 
+        font-size: 10px;
       }
 
       #scrollableList input[type="checkbox"] {
         margin-right: 5px;
-        font-size: 10px; 
+        font-size: 10px;
       }
 
       .checkboxes {
@@ -82,7 +89,20 @@
       }
       .row {
         display: flex;
-        margin-bottom: 20px; /* Добавьте отступ между строками */
+        margin-bottom: 10px; /* Добавьте отступ между строками */
+      }
+      button {
+        font-size: 10px;
+      }
+      .input-group {
+        display: flex;
+        align-items: center;
+      }
+      .input-group input[type="checkbox"] {
+        margin-right: 10px;
+      }
+      .input-group input {
+        font-size: 10px;
       }
     </style>
   </head>
@@ -140,16 +160,20 @@
             <img src="icons/arrows-move.svg" />
           </li>
           <li>
-            <input type="checkbox" class="group1" id="checkbox1" />
-            <label for="checkbox1">1</label>
+            <input type="checkbox" class="group1" id="heat" />
+            <label for="heat">Тепл</label>
           </li>
           <li>
-            <input type="checkbox" class="group1" id="checkbox2" />
-            <label for="checkbox2">2</label>
+            <input type="checkbox" class="group1" id="power" />
+            <label for="power">Эл</label>
           </li>
           <li>
-            <input type="checkbox" class="group1" id="checkbox3" />
-            <label for="checkbox3">3</label>
+            <input type="checkbox" class="group1" id="cold" />
+            <label for="cold">Вод</label>
+          </li>
+          <li>
+            <input type="checkbox" class="group1" id="fuel" />
+            <label for="fuel">Топл</label>
           </li>
         </ul>
       </section>
@@ -173,6 +197,10 @@
             style="height: 100px; overflow-y: auto; border: 1px solid #000"
           ></div>
         </div>
+        <div class="input-group">
+          <input type="checkbox" id="myCheckbox" />
+          <input type="text" id="myInput" placeholder="Введите текст" />
+        </div>
         <div class="row">
           <div class="checkboxes">
             <input type="checkbox" class="group3" id="heat" />
@@ -189,6 +217,10 @@
             style="height: 100px; overflow-y: auto; border: 1px solid #000"
           ></div>
         </div>
+        <div class="input-group">
+          <input type="checkbox" id="myCheckbox" />
+          <input type="text" id="myInput" placeholder="Введите текст" />
+        </div>
         <div class="row">
           <div class="checkboxes">
             <input type="checkbox" class="group4" id="heat" />
@@ -202,11 +234,16 @@
           </div>
           <div
             id="scrollableList3"
-            {# style="height: 100px; overflow-y: auto; border: 1px solid #000" #}
+            style="height: 100px; overflow-y: auto; border: 1px solid #000"
           ></div>
         </div>
+        <div class="input-group">
+          <input type="checkbox" id="myCheckbox" />
+          <input type="text" id="myInput" placeholder="Введите текст" />
+        </div>
+        <button name="button" id="save-equipment">Внести изменения</button>
       </section>
     </div>
-    <script src="scripts/test.js"></script>
+    <script src="scripts/test.js?v=23"></script>
   </body>
 </html>

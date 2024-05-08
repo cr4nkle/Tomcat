@@ -32,22 +32,22 @@ public class GetService {
     @GET
     @Path("/sources")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getSources() {
-        return getData(PostgresSecondHandler.getInstance()::readSources);
+    public Response getSources(@QueryParam("type") String type) {
+        return getData(() -> PostgresSecondHandler.getInstance().readSources(type));
     }
 
     @GET
     @Path("/consumers")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getConsumers() {
-        return getData(PostgresSecondHandler.getInstance()::readConsumers);
+    public Response getConsumers(@QueryParam("type") String type) {
+        return getData(() -> PostgresSecondHandler.getInstance().readLines(type));
     }
 
     @GET
     @Path("/lines")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getLines() {
-        return getData(PostgresSecondHandler.getInstance()::readLines);
+    public Response getLines(@QueryParam("type") String type) {
+        return getData(() -> PostgresSecondHandler.getInstance().readLines(type));
     }
 
     @GET

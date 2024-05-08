@@ -51,6 +51,7 @@ public class LinearSolver {
             problem.solve();// вызываем функцию, которая решает задачу
             double objective = problem.getWorkingObjective();
             double[] variables = problem.getPtrVariables();
+            deleteProblem();
 
             return new Solution(mathStatement, objective, variables);
         } catch (LpSolveException e) {
@@ -82,6 +83,13 @@ public class LinearSolver {
             }
         } else {
             return null;
+        }
+    }
+
+    private static void deleteProblem() {
+        if (problem != null) {
+            problem.deleteLp();
+            problem = null; // Устанавливаем ссылку на null, чтобы предотвратить повторное использование
         }
     }
 }

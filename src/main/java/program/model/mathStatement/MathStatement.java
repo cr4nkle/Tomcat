@@ -101,4 +101,20 @@ public class MathStatement {
     public ArrayList<Double> getLim() {
         return lim;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("MathStatement{");
+        sb.append("limits=").append(lim).append(", ");
+        sb.append("max=").append(max).append(", ");
+        sb.append("min=").append(min).append(", ");
+        sb.append("goal=").append(goal).append(", ");
+        sb.append("matrix=").append(matrix).append(", ");
+        sb.append("sign=").append(sign).append(", ");
+        sb.append("type=").append(type);
+        sb.append("}");
+        return sb.toString();
+    }
+
 }

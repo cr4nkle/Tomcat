@@ -1,0 +1,69 @@
+{
+  "startModal": {
+    "title": "",
+    "buttons": {
+      "newModel": "Создать новую модель",
+      "openDevice": "Открыть из устройства",
+      "openDataStorage": "Открыть из Хранилища данных"
+    }
+  },
+  "newModelModal": {
+    "title": "Введите название файла",
+    "placeholder": "Название файла",
+    "createModel": "Создать модель"
+  },
+  "chooseModelModal": {
+    "title": "Недавние модели",
+    "button": "Открыть модель"
+  },
+  "messageModal": {
+    "title": "Сообщение",
+    "close": "Закрыть"
+  },
+  "nodeModal": {
+    "title": "Информация на узле",
+    "checkboxes": {
+      "heat": "Теплоснабжение",
+      "power": "Электроснабжение",
+      "water": "Водоснабжение",
+      "fuel": "Топливоснабжение",
+      "block": "Заблокировать",
+      "all": "Выбрать всё"
+    },
+    "inf": {
+      "name": "Наименование",
+      "capCosts": "Кап. затраты",
+      "price": "Цена",
+      "genMax": "Генарация (max)",
+      "genMin": "Генарация (min)"
+    },
+    "save": "Сохранить",
+    "close": "Закрыть"
+  },
+  "resultModal": {
+    "title": "Результаты расчетов",
+    "save": "Сохранить",
+    "close": "Закрыть"
+  },
+  "toolbarButtons": {
+    "openNewModelModalToolbarBtn": "Создать новую модель",
+    "uploadToolbarBtn": "Открыть из устройства",
+    "openChooseModelModalToolbarBtn": "Открыть из Хранилища данных",
+    "saveToDataWarehouseToolbarBtn": "Сохранить в Хранилище данных",
+    "saveToDeviceToolbarBtn": "Сохранить на устройство",
+    "deleteModelToolbarBtn": "Удалить модель",
+    "operations": {
+      "addEdgeToolbarBtn": "Добавить ребро",
+      "addNodeToolbarBtn": "Добавить узел",
+      "editToolbarBtn": "Редактировать",
+      "deleteItemToolbarBtn": "Удалить элемент",
+      "calculateToolbarBtn": "Рассчитать модель",
+      "moveToolbarBtn": "Режим передвижения"
+    },
+    "elements": {
+      "sourceToolbarBtn": "Источник",
+      "distributionNodeToolbarBtn": "Узел распределения",
+      "consumerToolbarBtn": "Потребитель"
+    }
+  }
+}

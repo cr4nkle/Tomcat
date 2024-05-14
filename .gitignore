@@ -36,7 +36,7 @@ build/
 
 ### Mac OS ###
 .DS_Store
-/src/main/webapp/app/node_modules/
+/src/main/webapp/node_modules/
 /src/main/webapp/app/icons/
 /src/main/java/servlet/
 /src/main/java/org/example/

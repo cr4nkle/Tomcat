@@ -1,12 +1,7 @@
 package program.rest;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import program.database.PostgresThirdHandler;
-import program.logic.solurion.LinearStatement;
-import program.logic.solurion.NodeSolution;
+import program.logic.statement.LinearStatement;
 import program.model.compressedGraph.Graph;
 import program.model.mathStatement.MathStatement;
 import program.model.mathStatement.Problem;
@@ -15,7 +10,6 @@ import program.model.mathStatement.Solution;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalTime;
 

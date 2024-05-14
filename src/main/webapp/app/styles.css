@@ -1,0 +1,304 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Inter", sans-serif !important;
+  font-weight: 400;
+  font-size: 16px;
+  color: rgb(21, 21, 21);
+  flex-direction: column;
+  min-height: 100vh;
+  position: relative;
+}
+
+.header {
+  position: relative;
+  z-index: 1;
+}
+
+#cy {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+ul {
+  list-style: none;
+}
+
+dialog {
+  border: none;
+}
+
+button {
+  border: none;
+  color: inherit;
+  font-size: inherit;
+  font-family: inherit;
+  font-weight: inherit;
+  background-color: none;
+  outline: none;
+}
+
+input {
+  border: none;
+  color: inherit;
+  font-size: inherit;
+  font-family: inherit;
+  font-weight: inherit;
+  background-color: none;
+  outline: none;
+}
+
+.list-column {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.modal_choose_model_list {
+  max-height: 200px;
+  overflow-y: scroll;
+  /* padding: 15px 0px; */
+  border: 1px solid rgb(202, 202, 202);
+  border-radius: 5px;
+}
+.text-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+}
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.modal_choose_model_item {
+  /* background-color: rgb(242, 242, 242); */
+  transition: all 350ms ease;
+  padding: 5px;
+  cursor: pointer;
+}
+
+.modal_choose_model_item:hover {
+  background-color: rgb(243, 243, 243);
+}
+
+.modal_choose_model_item.selected {
+  background-color: rgb(243, 243, 243);
+}
+
+.modal_node_blocks {
+  display: flex;
+  gap: 25px;
+}
+
+.modal_node_item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 0px;
+}
+.modal_node_item + .modal_node_item {
+  border-top: 1px solid rgb(224, 224, 224);
+}
+.modal_node_btns {
+  display: flex;
+  justify-content: end;
+  gap: 5px;
+}
+
+.modal_node_block {
+  padding: 10px;
+  border-radius: 7px;
+  background-color: white;
+  border: 1px solid rgba(204, 204, 204, 0.724);
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.078);
+}
+
+.modal_node_block_inf {
+  overflow-y: scroll;
+  max-height: 167px;
+  width: 350px;
+}
+
+/* Стили для кнопок */
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 10px;
+  border-radius: 10px;
+  transition: all 250ms ease;
+  cursor: pointer;
+}
+
+.btn.btn-primary {
+  background-color: rgb(83, 83, 255);
+  color: rgb(238, 238, 238);
+  border-bottom: 3px solid rgb(142, 142, 255);
+}
+
+.btn.btn-secondary {
+  background-color: rgb(255, 255, 255);
+  border: 1px solid rgba(45, 45, 45, 0.578);
+}
+.btn.btn-secondary:not([disabled]):hover {
+  border: solid 1px rgb(107, 141, 255);
+  box-shadow: 0px 0px 7px rgba(131, 160, 255, 0.358);
+}
+.btn.btn-primary:not([disabled]):hover {
+  background-color: rgb(65, 65, 255);
+}
+
+.btn.btn-text:not([disabled]):hover {
+  background-color: rgb(221, 221, 221);
+}
+.btn img {
+  width: 20px;
+}
+
+.upload-inp {
+  display: none;
+}
+
+.btn:disabled {
+  opacity: 20%;
+  cursor: not-allowed !important;
+}
+
+.btn.selected {
+  background-color: rgb(221, 221, 221);
+  box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.187);
+}
+
+/* стили для input */
+
+.inp {
+  padding: 7px 14px;
+  border: solid 1px rgb(188, 188, 188);
+  border-radius: 7px;
+  transition: all 350ms ease;
+}
+.inp:focus {
+  border: solid 1px rgb(46, 95, 255);
+  box-shadow: 0px 0px 7px rgba(104, 139, 255, 0.358);
+}
+
+/* toolpit */
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  font-size: 11px;
+  background-color: rgba(13, 13, 13, 0.863);
+  color: #fff;
+  text-align: center;
+  padding: 5px;
+  border-radius: 6px;
+  position: absolute;
+  z-index: 1;
+  width: 100px;
+  top: 100%;
+  left: 50%;
+  margin-left: -50px;
+}
+
+.tooltip .tooltiptext::after {
+  content: " ";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent black transparent;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
+
+.checkbox {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.header {
+  background-color: rgb(243, 243, 243);
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.322);
+}
+
+.modal {
+  background: rgb(255, 255, 255);
+  padding: 15px 25px;
+  min-width: 350px;
+  min-height: 100px;
+  margin: auto;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.16);
+  border-radius: 5px;
+}
+
+.modal_content {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.modal_title {
+  /* text-align: center; */
+  color: rgb(61, 61, 61);
+}
+
+.modal_start_btns {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 5px 0px;
+  /* border-top: 1px solid rgba(128, 128, 128, 0.251);
+  border-bottom: 1px solid rgba(128, 128, 128, 0.251); */
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  width: 100vw;
+}
+
+.toolbar_list {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 0px 25px;
+}
+
+.toolbar_item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 350ms ease;
+}
+.toolbar_item:hover {
+  background-color: rgb(221, 221, 221);
+}
+.toolbar_item img {
+  width: 20px;
+}

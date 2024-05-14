@@ -10,5 +10,6 @@ public class Constant {
     public static final String THIRD_CLIENT_URL = "jdbc:postgresql://localhost:5432/modelStorage";
     public static final String THIRD_CLIENT_USER = "postgres";
     public static final String THIRD_CLIENT_PASSWORD = "root";
-    public static final String PATH = "C:/Users/cr4nk/IdeaProjects/Tomcat/src/main/webapp/static/style.json";
+    public static final String STYLE_PATH = "C:/Users/cr4nk/IdeaProjects/Tomcat/src/main/webapp/static/style.json";
+    public static final String RU_LOCALE_PATH = "C:/Users/cr4nk/IdeaProjects/Tomcat/src/main/webapp/static/ru.json";
 }

@@ -1,6 +1,6 @@
 {
   "startModal": {
-    "title": "",
+    "title": "Начало работы",
     "buttons": {
       "newModel": "Создать новую модель",
       "openDevice": "Открыть из устройства",
@@ -8,8 +8,8 @@
     }
   },
   "newModelModal": {
-    "title": "Введите название файла",
-    "placeholder": "Название файла",
+    "title": "Введите название модели",
+    "placeholder": "Название модели",
     "createModel": "Создать модель"
   },
   "chooseModelModal": {
@@ -21,7 +21,7 @@
     "close": "Закрыть"
   },
   "nodeModal": {
-    "title": "Информация на узле",
+    "title": "Информация об оборудовании",
     "checkboxes": {
       "heat": "Теплоснабжение",
       "power": "Электроснабжение",
@@ -58,7 +58,8 @@
       "editToolbarBtn": "Редактировать",
       "deleteItemToolbarBtn": "Удалить элемент",
       "calculateToolbarBtn": "Рассчитать модель",
-      "moveToolbarBtn": "Режим передвижения"
+      "moveToolbarBtn": "Режим передвижения",
+      "bullseyeToolbarBtn": "Перейти к модели"
     },
     "elements": {
       "sourceToolbarBtn": "Источник",

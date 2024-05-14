@@ -26,7 +26,7 @@ public class GetService {
     @Path("/modelName")
     @Produces(MediaType.APPLICATION_JSON) //можно добавить количество моделей в запросе
     public Response getModelName() {
-        return getData(PostgresFirstHandler.getInstance()::readModelNames);
+        return getData(PostgresThirdHandler.getInstance()::readModelNames);
     }
 
     @GET
@@ -40,7 +40,7 @@ public class GetService {
     @Path("/consumers")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getConsumers(@QueryParam("type") String type) {
-        return getData(() -> PostgresSecondHandler.getInstance().readLines(type));
+        return getData(() -> PostgresSecondHandler.getInstance().readConsumers(type));
     }
 
     @GET
@@ -70,7 +70,30 @@ public class GetService {
     public Response getStyle() {
         String jsonString = null;
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(Constant.PATH));
+            BufferedReader reader = new BufferedReader(new FileReader(Constant.STYLE_PATH));
+            StringBuilder content = new StringBuilder();
+            String line = reader.readLine();
+            while (line != null) {
+                content.append(line).append(System.lineSeparator());
+                line = reader.readLine();
+            }
+            reader.close();
+            jsonString = content.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+
+        return Response.ok(jsonString).build();
+    }
+
+    @GET
+    @Path("/locale")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getLocale() {
+        String jsonString = null;
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(Constant.RU_LOCALE_PATH));
             StringBuilder content = new StringBuilder();
             String line = reader.readLine();
             while (line != null) {

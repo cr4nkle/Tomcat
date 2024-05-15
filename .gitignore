@@ -40,5 +40,5 @@ build/
 /src/main/webapp/app/icons/
 /src/main/java/servlet/
 /src/main/java/org/example/
-/src/main/webapp/static/style.json
-/pom_example.txt
+/src/main/webapp/app/static/style.json
+

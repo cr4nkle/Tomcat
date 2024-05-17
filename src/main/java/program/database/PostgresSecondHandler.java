@@ -5,6 +5,10 @@ import program.model.metainfo.Line;
 import program.model.metainfo.Source;
 import program.utils.Constant;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 
@@ -14,11 +18,16 @@ public class PostgresSecondHandler {
 
     private PostgresSecondHandler() {
         try {
-            this.connection = DriverManager.getConnection(
-                    Constant.SECOND_CLIENT_URL, Constant.SECOND_CLIENT_USER, Constant.SECOND_CLIENT_PASSWORD);
+            Context initCtx = new InitialContext();
+            Context envCtx = (Context) initCtx.lookup("java:comp/env");
+            DataSource ds = (DataSource)
+                    envCtx.lookup("jdbc/postgres/second_client");
+            this.connection = ds.getConnection();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
             throw new RuntimeException("Failed to establish database connection", e);
+        } catch (NamingException e) {
+            throw new RuntimeException(e);
         }
     }
 

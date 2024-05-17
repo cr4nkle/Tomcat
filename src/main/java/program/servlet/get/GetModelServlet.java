@@ -14,7 +14,7 @@ import program.model.compressedGraph.Graph;
 import java.io.IOException;
 import java.util.Optional;
 
-@WebServlet("/api/get/model")
+//@WebServlet("/api/get/model")
 public class GetModelServlet extends HttpServlet {
 
     @Override

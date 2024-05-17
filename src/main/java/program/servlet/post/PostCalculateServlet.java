@@ -16,7 +16,7 @@ import java.time.LocalTime;
 
 import static program.logic.solver.LinearSolver.optimate;
 
-@WebServlet("/api/post/calculate")
+//@WebServlet("/api/post/calculate")
 public class PostCalculateServlet extends HttpServlet {
 
     @Override

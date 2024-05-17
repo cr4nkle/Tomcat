@@ -1,12 +1,10 @@
-package program.model.graph;
+package program.model.style;
 
 import com.fasterxml.jackson.annotation.*;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StyleRule {
-    @JsonIgnore
-    private int idFromDB;
     @JsonProperty("selector")
     private String selector;
     @JsonProperty("style")
@@ -16,9 +14,8 @@ public class StyleRule {
 
     @JsonCreator
     public StyleRule (
-                      @JsonProperty("selector") String selector,
-                      @JsonProperty("style") Style style) {
-//        this.idFromDB = idFromDB;
+            @JsonProperty("selector") String selector,
+            @JsonProperty("style") Style style) {
         this.selector = selector;
         this.style = style;
     }
@@ -37,13 +34,5 @@ public class StyleRule {
 
     public void setSelector(String selector) {
         this.selector = selector;
-    }
-
-    public int getIdFromDB() {
-        return idFromDB;
-    }
-
-    public void setIdFromDB(int idFromDB) {
-        this.idFromDB = idFromDB;
     }
 }

@@ -10,7 +10,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
-@WebServlet("/api/get/locale")
+//@WebServlet("/api/get/locale")
 public class GetLocaleServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     @Override

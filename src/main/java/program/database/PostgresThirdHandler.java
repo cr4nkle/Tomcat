@@ -6,9 +6,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import program.model.ModelName;
 import program.model.compressedGraph.*;
 import program.model.graph.Position;
-import program.model.graph.StyleRule;
 import program.utils.Constant;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
 import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
@@ -20,10 +23,15 @@ public class PostgresThirdHandler {
 
     private PostgresThirdHandler() {
         try {
-            this.connection = DriverManager.getConnection(
-                    Constant.THIRD_CLIENT_URL, Constant.THIRD_CLIENT_USER, Constant.THIRD_CLIENT_PASSWORD);
+            Context initCtx = new InitialContext();
+            Context envCtx = (Context) initCtx.lookup("java:comp/env");
+            DataSource ds = (DataSource)
+                    envCtx.lookup("jdbc/postgres/first_client");
+            this.connection = ds.getConnection();
         } catch (SQLException e) {
             throw new RuntimeException("Failed to establish database connection", e);
+        } catch (NamingException e) {
+            throw new RuntimeException(e);
         }
     }
 

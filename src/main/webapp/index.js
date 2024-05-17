@@ -1,4 +1,4 @@
-const localeUrl = "http://localhost:8080/app/api/get/locale";
+const localeUrl = "http://localhost:8080/app/rest/get/locale";
 let selectedObjectsIds = [];
 
 // Функция для получения элемента по его id
@@ -1075,7 +1075,7 @@ function getMaxNodeId(cy) {
 
 // Функция для инициализации графа с данными, полученными из запроса
 function initializeGraph(request, properties) {
-  let url = "http://localhost:8080/app/api/get/style";
+  let url = "http://localhost:8080/app/rest/get/style";
   // Возвращаем промис, который будет разрешен с объектом графа Cytoscape
   return new Promise((resolve, reject) => {
     // Используем Promise.all для параллельного выполнения двух асинхронных запросов
@@ -1109,7 +1109,8 @@ function initializeGraph(request, properties) {
 
 // Функция для инициализации пустого графа
 function initializeEmptyGraph(properties) {
-  let url = "http://localhost:8080/app/api/get/style";
+  let url = "http://localhost:8080/app/rest/get/style";
+  console.log();
   // Возвращаем промис, который будет разрешен с объектом графа Cytoscape
   return new Promise((resolve, reject) => {
     // Используем Promise.all для выполнения асинхронного запроса загрузки стилей графа
@@ -1119,6 +1120,7 @@ function initializeEmptyGraph(properties) {
       }),
     ])
       .then((dataArray) => {
+        console.log(dataArray[0]);
         // Создаем объект графа Cytoscape без элементов
         const cy = cytoscape({
           container: properties.container, // Контейнер для графа

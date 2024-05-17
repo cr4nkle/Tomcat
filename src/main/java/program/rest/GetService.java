@@ -3,9 +3,10 @@ package program.rest;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import program.database.PostgresFirstHandler;
 import program.database.PostgresSecondHandler;
 import program.database.PostgresThirdHandler;
+import program.model.locale.ModalConfig;
+import program.model.style.StyleRuleList;
 import program.utils.Constant;
 
 import javax.ws.rs.GET;
@@ -14,9 +15,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.function.Supplier;
 
@@ -57,57 +56,34 @@ public class GetService {
         return getData(() -> PostgresThirdHandler.getInstance().readModelByName(name));
     }
 
-//    @GET
-//    @Path("/test")
-//    @Produces(MediaType.APPLICATION_JSON)
-//    public Response getTest(@QueryParam("name") String name) {
-//        return getData(() -> PostgresThirdHandler.getInstance().readModelByName(name));
-//    }
-
     @GET
     @Path("/style")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getStyle() {
-        String jsonString = null;
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(Constant.STYLE_PATH));
-            StringBuilder content = new StringBuilder();
-            String line = reader.readLine();
-            while (line != null) {
-                content.append(line).append(System.lineSeparator());
-                line = reader.readLine();
-            }
-            reader.close();
-            jsonString = content.toString();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-        }
-
-        return Response.ok(jsonString).build();
+        return readJson(Constant.STYLE_PATH, StyleRuleList.class);
     }
 
     @GET
     @Path("/locale")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getLocale() {
-        String jsonString = null;
+        return readJson(Constant.RU_LOCALE_PATH, ModalConfig.class);
+    }
+
+    private <T> Response readJson(String path, Class<T> valueType) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        T result;
+
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(Constant.RU_LOCALE_PATH));
-            StringBuilder content = new StringBuilder();
-            String line = reader.readLine();
-            while (line != null) {
-                content.append(line).append(System.lineSeparator());
-                line = reader.readLine();
-            }
-            reader.close();
-            jsonString = content.toString();
+            result = objectMapper.readValue(new File(path), valueType);
         } catch (IOException e) {
-            e.printStackTrace();
+            // Log the exception instead of printing the stack trace
+            // Consider using a logger like SLF4J or Log4j
+            System.err.println("Failed to read JSON from " + path + ": " + e.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
 
-        return Response.ok(jsonString).build();
+        return Response.ok(result).build();
     }
 
     private <T> Response getData(Supplier<T> dataSupplier) {

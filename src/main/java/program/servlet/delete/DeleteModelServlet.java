@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebServlet("/delete/model")
+//@WebServlet("/delete/model")
 public class DeleteModelServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 

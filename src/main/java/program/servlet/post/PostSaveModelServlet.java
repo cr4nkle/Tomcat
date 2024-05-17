@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebServlet("/api/post/saveModel")
+//@WebServlet("/api/post/saveModel")
 public class PostSaveModelServlet extends HttpServlet {
 
     @Override

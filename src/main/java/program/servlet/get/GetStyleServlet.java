@@ -11,7 +11,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
-@WebServlet("/api/get/style")
+//@WebServlet("/api/get/style")
 public class GetStyleServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 

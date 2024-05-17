@@ -7,17 +7,17 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import program.model.ModelName;
 import program.model.graph.*;
+import program.model.style.StyleRule;
 import program.utils.Constant;
 
 import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class PostgresFirstHandler {
     private Connection connection;
     private static volatile PostgresFirstHandler INSTANCE;
-
+//не используется
     private PostgresFirstHandler(){
         try {
             this.connection = DriverManager.getConnection(

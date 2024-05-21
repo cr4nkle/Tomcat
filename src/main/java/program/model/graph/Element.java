@@ -15,11 +15,12 @@ public class Element {
     @JsonProperty("edges")
     private ArrayList<Edge> edges;
 
-    public Element(){}
+    public Element() {
+    }
 
     @JsonCreator
-    public Element (@JsonProperty("nodes") ArrayList<Node> nodes,
-                    @JsonProperty("edges") ArrayList<Edge> edges) {
+    public Element(@JsonProperty("nodes") ArrayList<Node> nodes,
+                   @JsonProperty("edges") ArrayList<Edge> edges) {
         this.nodes = nodes;
         this.edges = edges;
     }
@@ -38,10 +39,5 @@ public class Element {
 
     public void setEdges(ArrayList<Edge> edges) {
         this.edges = edges;
-    }
-
-    @Override
-    public String toString() {
-        return "nodes=" + nodes.toString() + " " + "edges" + edges.toString();
     }
 }

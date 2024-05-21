@@ -1,17 +1,38 @@
 package program.logic.solver;
 
+import java.sql.SQLException;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lpsolve.*;
+import program.database.PostgresSecondHandler;
 import program.model.mathStatement.MathStatement;
 import program.model.mathStatement.Solution;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 public class LinearSolver {
-    private static LpSolve problem;// создаём экземпляр решателя
+    private static volatile LinearSolver INSTANCE;
 
-    public static Solution optimate(MathStatement mathStatement) {
+    private LinearSolver() {
+    }
+
+    public static LinearSolver getInstance() {
+        System.out.println("Делаем солвер");
+        if (INSTANCE == null) {
+            synchronized (LinearSolver.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = new LinearSolver();
+                }
+            }
+        }
+        return INSTANCE;
+    }
+
+    public Solution optimate(MathStatement mathStatement) {
+        System.out.println("Решаем");
         ObjectMapper objectMapper = new ObjectMapper();
         double[][] matrix = objectMapper.convertValue(mathStatement.getMatrix(), double[][].class);
         double[] goal = objectMapper.convertValue(mathStatement.getGoal(), double[].class);
@@ -20,48 +41,56 @@ public class LinearSolver {
         double[] max = objectMapper.convertValue(mathStatement.getMax(), double[].class);
         int[] sign = objectMapper.convertValue(mathStatement.getSign(), int[].class);
         boolean[] type = objectMapper.convertValue(mathStatement.getType(), boolean[].class);
-
+        double objective = 0.0;
+        double[] variables = null;
+        LpSolve problem = null;
+        System.out.println("Объявили переменные");
         try {
+            //тут падает
             problem = LpSolve.makeLp(0, goal.length - 1);// указываем количество ограничений и длину целевой функции
             problem.setObjFn(goal);// задаём целевую функцию
-
+            System.out.println("Задали целевую");
             int i = 1;
             for (boolean b : type) {
                 problem.setInt(i++, b);
             }
-
+            System.out.println("1");
             if (matrix != null) {
                 // ограничения в виде неравенств
                 for (int j = 0; j < matrix.length; j++) {
                     problem.addConstraint(matrix[j], sign[j], lim[j]);
                 }
             }
-
+            System.out.println("2");
             // накладываем ограничения на переменные
             i = 1;
             for (double mn : min) {
                 problem.setLowbo(i++, mn);
             }
-
+            System.out.println("3");
             i = 1;
             for (double mx : max) {
                 problem.setUpbo(i++, mx);
             }
-
+            
             problem.solve();// вызываем функцию, которая решает задачу
-            double objective = problem.getWorkingObjective();
-            double[] variables = problem.getPtrVariables();
-            deleteProblem();
-
-            return new Solution(mathStatement, objective, variables);
-        } catch (LpSolveException e) {
-            throw new RuntimeException(e);
+            System.out.println("Решили");
+            objective = getObjective(problem);
+            variables = getVariables(problem);
+            System.out.println("Нашли переменные");
+            deleteProblem(problem);
+            System.out.println("Задали целевую");
+        } catch (Exception exception) {
+            System.out.println(exception.getMessage());
         }
-
+        System.out.println("Возвращаем");
+        Solution solution = new Solution(mathStatement, objective, variables);
+        System.out.println(solution.getObjective());
+        return solution;
     }
 
     // функция возвращает значение целевой функции
-    public static double getObjective() {
+    public double getObjective(LpSolve problem) {
         if (problem != null) {
             try {
                 return problem.getWorkingObjective();
@@ -74,7 +103,7 @@ public class LinearSolver {
     }
 
     // функция возвращает вектор переменных
-    public static double[] getVariables() {
+    public double[] getVariables(LpSolve problem) {
         if (problem != null) {
             try {
                 return problem.getPtrVariables();
@@ -86,7 +115,7 @@ public class LinearSolver {
         }
     }
 
-    private static void deleteProblem() {
+    private static void deleteProblem(LpSolve problem) {
         if (problem != null) {
             problem.deleteLp();
             problem = null; // Устанавливаем ссылку на null, чтобы предотвратить повторное использование

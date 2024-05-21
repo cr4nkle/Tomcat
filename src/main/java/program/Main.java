@@ -1,29 +1,37 @@
 package program;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import program.logic.statement.LinearStatement;
 import program.logic.xml.XmlGenerator;
-import program.model.compressedGraph.EdgeData;
-import program.model.compressedGraph.NodeData;
-import program.model.mathStatement.MathStatement;
-import program.model.mathStatement.Problem;
-import program.model.mathStatement.Solution;
+import program.model.locale.ModalConfig;
+import program.utils.Constant;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.time.*;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.io.InputStream;
 
-import static program.logic.solver.LinearSolver.*;
+import javax.ws.rs.core.Response;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        XmlGenerator xmlGenerator = new XmlGenerator();
-        xmlGenerator.generate();
+        // XmlGenerator xmlGenerator = new XmlGenerator();
+        // xmlGenerator.generate();
+        ObjectMapper objectMapper = new ObjectMapper();
+        ModalConfig result;
+        try {
+            InputStream inputStream = Main.class.getClassLoader().getResourceAsStream(Constant.RU_LOCALE_PATH);
+            if (inputStream == null) {
+                throw new FileNotFoundException("File not found: " + Constant.RU_LOCALE_PATH);
+            }
+            
+            result = objectMapper.readValue(inputStream, ModalConfig.class);
+            System.out.println(result);
+        } catch (IOException e) {
 
+            System.err.println("Failed to read JSON from " + Constant.RU_LOCALE_PATH + ": " + e.getMessage());
+    
+        }
 //        ArrayList<String> first = new ArrayList<>();
 //        ArrayList<String> second = new ArrayList<>();
 //        first.add("n1");

@@ -1,4 +1,4 @@
-package program.model.compressedGraph;
+package program.model.graph;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

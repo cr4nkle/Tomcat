@@ -233,7 +233,7 @@ elements.createModelBtn.addEventListener("click", async () => {
 //открыть из бд в тулбаре
 elements.openChooseModelModalToolbarBtn.addEventListener("click", async () => {
   elements.chooseModelModal.showModal(); //показываем окно с выбором названий
-  let url = "http://localhost:8080/app/api/get/modelName";
+  let url = "http://localhost:8080/app/rest/get/models";
   let selectedModel = null;
   const response = await loadDataFromServer(url);
   const modelList = response.name;
@@ -279,7 +279,7 @@ elements.openChooseModelModalToolbarBtn.addEventListener("click", async () => {
         showMessage("Ввод отменен");
       }
       // Создаем URL для запроса к серверу с именем модели
-      let url = `http://localhost:8080/app/api/get/model?name=${modelName}`;
+      let url = `http://localhost:8080/app/rest/get/model?name=${modelName}`;
       // Инициализируем граф с данными из сервера
       cy = await initializeGraph(new Request(url), cyProperties);
       initializeGraphMethods(cy);
@@ -292,7 +292,7 @@ elements.openChooseModelModalToolbarBtn.addEventListener("click", async () => {
 //нажатие на кнопку открыть из бд со стартового окна
 elements.openChooseModelModalBtn.addEventListener("click", async () => {
   elements.startModal.close();
-  let url = "http://localhost:8080/app/api/get/modelName";
+  let url = "http://localhost:8080/app/rest/get/models";
   let selectedModel = null;
   const response = await loadDataFromServer(url);
   const modelList = response.name;
@@ -393,7 +393,7 @@ elements.saveToDeviceToolbarBtn.addEventListener("click", () => {
 //соханяем в базу данных
 elements.saveToDataWarehouseToolbarBtn.addEventListener("click", async () => {
   if (cy !== null) {
-    let url = "http://localhost:8080/app/api/post/saveModel";
+    let url = "http://localhost:8080/app/rest/post/saveModel";
     // Получаем JSON представление графа
     let graphJSON = cy.json();
     // Получаем идентификаторы всех ребер
@@ -410,6 +410,7 @@ elements.saveToDataWarehouseToolbarBtn.addEventListener("click", async () => {
     graphJSON["node_ids"] = nodeIds;
     graphJSON["edge_ids"] = edgeIds;
     // Преобразуем JSON в строку
+    console.log(graphJSON);
     let data = JSON.stringify(graphJSON);
     showMessage("Модель сохранена");
     // Отправляем данные на сервер для сохранения модели
@@ -420,7 +421,7 @@ elements.saveToDataWarehouseToolbarBtn.addEventListener("click", async () => {
 //удаление модели
 elements.deleteModelToolbarBtn.addEventListener("click", () => {
   // Создаем URL для запроса к серверу на удаление модели
-  let deleteUrl = `http://localhost:8080/app/api/delete/model?name=${modelName}`;
+  let deleteUrl = `http://localhost:8080/app/rest/delete/model?name=${modelName}`;
   // Вызываем функцию для удаления данных с сервера
   deleteDataFromServer(deleteUrl);
   showMessage(`Модель ${modelName} удалена.`);
@@ -631,7 +632,7 @@ elements.calculateToolbarBtn.addEventListener("click", async () => {
       return element.style("display") !== "none";
     });
 
-    const url = "http://localhost:8080/app/api/post/calculate";
+    const url = "http://localhost:8080/app/rest/post/calculate";
     // Получаем данные проблемы для расчета
     let problem = getLinearProblem(visibleElements);
     // let nProblem = getNonLinearProblem(visibleElements);
@@ -1273,7 +1274,7 @@ async function handleNodeClick(node) {
 
   if (nodeType === "source") {
     fill = async (systemType) => {
-      let url = `http://localhost:8080/app/api/get/sources?type=${systemType}`;
+      let url = `http://localhost:8080/app/rest/get/sources?type=${systemType}`;
       const data = await loadDataFromServer(url);
 
       elements.nodeModalList.innerHTML = "";
@@ -1295,7 +1296,7 @@ async function handleNodeClick(node) {
     };
   } else if (nodeType === "consumer") {
     fill = async (systemType) => {
-      let url = `http://localhost:8080/app/api/get/consumers?type=${systemType}`;
+      let url = `http://localhost:8080/app/rest/get/consumers?type=${systemType}`;
       const data = await loadDataFromServer(url);
 
       elements.nodeModalList.innerHTML = "";
@@ -1390,7 +1391,7 @@ async function handleEdgeClick(edge) {
   console.log(isLocked);
 
   const fill = async (systemType) => {
-    let url = `http://localhost:8080/app/api/get/lines?type=${systemType}`;
+    let url = `http://localhost:8080/app/rest/get/lines?type=${systemType}`;
     const data = await loadDataFromServer(url);
 
     elements.nodeModalList.innerHTML = "";

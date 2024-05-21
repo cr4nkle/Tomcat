@@ -12,6 +12,7 @@ public class Operations {
     private String deleteItemToolbarBtn;
     private String calculateToolbarBtn;
     private String moveToolbarBtn;
+    private String bullseyeToolbarBtn;
 
     public Operations() {
     }
@@ -22,7 +23,8 @@ public class Operations {
             String editToolbarBtn,
             String deleteItemToolbarBtn,
             String calculateToolbarBtn,
-            String moveToolbarBtn
+            String moveToolbarBtn,
+            String bullseyeToolbarBtn
     ) {
         this.addEdgeToolbarBtn = addEdgeToolbarBtn;
         this.addNodeToolbarBtn = addNodeToolbarBtn;
@@ -30,6 +32,7 @@ public class Operations {
         this.deleteItemToolbarBtn = deleteItemToolbarBtn;
         this.calculateToolbarBtn = calculateToolbarBtn;
         this.moveToolbarBtn = moveToolbarBtn;
+        this.bullseyeToolbarBtn = bullseyeToolbarBtn;
     }
 
     public String getAddEdgeToolbarBtn() {
@@ -56,6 +59,10 @@ public class Operations {
         return moveToolbarBtn;
     }
 
+    public String getBullseyeToolbarBtn(){
+        return bullseyeToolbarBtn;
+    }
+
     public void setAddEdgeToolbarBtn(String addEdgeToolbarBtn) {
         this.addEdgeToolbarBtn = addEdgeToolbarBtn;
     }
@@ -78,5 +85,9 @@ public class Operations {
 
     public void setMoveToolbarBtn(String moveToolbarBtn) {
         this.moveToolbarBtn = moveToolbarBtn;
+    }
+
+    public void setBullseyeToolbarBtn(String bullseyeToolbarBtn){
+        this.bullseyeToolbarBtn = bullseyeToolbarBtn;
     }
 }

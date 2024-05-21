@@ -1,7 +1,7 @@
 package program.logic.statement;
 
-import program.model.compressedGraph.EdgeData;
-import program.model.compressedGraph.NodeData;
+import program.model.graph.EdgeData;
+import program.model.graph.NodeData;
 import program.model.mathStatement.MathStatement;
 import program.model.mathStatement.Problem;
 

@@ -16,14 +16,33 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.function.Supplier;
 
 @Path("/get")
 public class GetService {
+    // @GET
+    // @Produces("image/x-icon")
+    // @Path("/favicon.ico")
+    // public Response getFavicon() {
+    // try {
+    // byte[] bytes =
+    // Files.readAllBytes(Paths.get(getClass().getClassLoader().getResource("favicon.ico").toURI()));
+    // return Response.ok(bytes).type("image/x-icon").build();
+    // } catch (IOException | URISyntaxException e) {
+    // // Обработка исключений
+    // throw new RuntimeException(e);
+    // }
+    // }
+
     @GET
-    @Path("/modelName")
-    @Produces(MediaType.APPLICATION_JSON) //можно добавить количество моделей в запросе
+    @Path("/models")
+    @Produces(MediaType.APPLICATION_JSON) // можно добавить количество моделей в запросе
     public Response getModelName() {
         return getData(PostgresThirdHandler.getInstance()::readModelNames);
     }
@@ -75,12 +94,16 @@ public class GetService {
         T result;
 
         try {
-            result = objectMapper.readValue(new File(path), valueType);
+            InputStream inputStream = getClass().getClassLoader().getResourceAsStream(path);
+            if (inputStream == null) {
+                throw new FileNotFoundException("File not found: " + path);
+            }
+
+            result = objectMapper.readValue(inputStream, valueType);
         } catch (IOException e) {
-            // Log the exception instead of printing the stack trace
-            // Consider using a logger like SLF4J or Log4j
+
             System.err.println("Failed to read JSON from " + path + ": " + e.getMessage());
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+            return Response.ok("Failed to read JSON").build();
         }
 
         return Response.ok(result).build();

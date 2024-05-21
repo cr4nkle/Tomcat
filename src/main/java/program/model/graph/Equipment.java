@@ -1,12 +1,16 @@
 package program.model.graph;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Equipment {
-    @JsonIgnore
-    private int idFromDB;
+    @JsonProperty("id")
+    private int id;
+    @JsonProperty("installed")
+    private boolean installed;
     @JsonProperty("name")
     private String name;
     @JsonProperty("price")
@@ -24,10 +28,13 @@ public class Equipment {
     @JsonProperty("load")
     private int load;
 
-    public Equipment () {}
+    public Equipment() {
 
-    @JsonCreator
-    public Equipment (
+    }
+
+    public Equipment(
+            @JsonProperty("id") int id,
+            @JsonProperty("installed") boolean installed,
             @JsonProperty("name") String name,
             @JsonProperty("price") float price,
             @JsonProperty("throughput") int throughput,
@@ -36,6 +43,8 @@ public class Equipment {
             @JsonProperty("max_gen") int maxGen,
             @JsonProperty("min_gen") int minGen,
             @JsonProperty("load") int load) {
+        this.id = id;
+        this.installed = installed;
         this.name = name;
         this.price = price;
         this.cost = cost;
@@ -44,6 +53,18 @@ public class Equipment {
         this.minGen = minGen;
         this.resistance = resistance;
         this.load = load;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public boolean isInstalled() {
+        return installed;
     }
 
     public void setPrice(float price) {
@@ -108,13 +129,5 @@ public class Equipment {
 
     public int getLoad() {
         return load;
-    }
-
-    public int getIdFromDB() {
-        return idFromDB;
-    }
-
-    public void setIdFromDB(int idFromDB) {
-        this.idFromDB = idFromDB;
     }
 }

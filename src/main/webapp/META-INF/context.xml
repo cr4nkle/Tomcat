@@ -3,22 +3,15 @@
     <Resource name="jdbc/postgres/first_client" auth="Container"
               type="javax.sql.DataSource"
               driverClassName="org.postgresql.Driver"
-              url="jdbc:postgresql://localhost:5432/modelStorage"
+              url="jdbc:postgresql://modelStorage:5432/modelStorage"
               username="postgres" password="root"
               maxActive="100" maxIdle="30" maxWait="-1"/>
 
     <Resource name="jdbc/postgres/second_client" auth="Container"
               type="javax.sql.DataSource"
               driverClassName="org.postgresql.Driver"
-              url="jdbc:postgresql://localhost:5432/metaInfo"
+              url="jdbc:postgresql://metaInfo:5432/metaInfo"
               username="postgres" password="root"
               maxActive="100" maxIdle="30" maxWait="-1"/>
-
-<!--    <Resources className="org.apache.catalina.webresources.StandardRoot" cachingAllowed="true"-->
-<!--               cacheMaxSize="10000" cacheObjectMaxSize="512">-->
-<!--        <PreResources base="C:/Program Files/Apache Software Foundation/Tomcat 9.0/webapps/app/static"-->
-<!--                      className="org.apache.catalina.webresources.DirResourceSet"-->
-<!--                      webAppMount="/static"/>-->
-<!--    </Resources>-->
 </Context>
 

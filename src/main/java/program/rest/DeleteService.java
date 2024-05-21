@@ -19,25 +19,4 @@ public class DeleteService {
         postgresThirdHandler.deleteModel(name);
         return Response.ok("{\"message\": \"Удалено\"}").build();
     }
-
-    @DELETE
-    @Path("/node")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response deleteNode(@QueryParam("id") int id) {
-        return Response.ok().build();
-    }
-
-    @DELETE
-    @Path("/edge")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response deleteEdge(@QueryParam("id") int id) {
-        return Response.ok().build();
-    }
-
-    @DELETE
-    @Path("/equipment")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response deleteEquipment(@QueryParam("id") int id) {
-        return Response.ok().build();
-    }
 }

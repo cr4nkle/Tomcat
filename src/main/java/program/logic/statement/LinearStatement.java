@@ -1,7 +1,7 @@
 package program.logic.statement;
 
-import program.model.compressedGraph.EdgeData;
-import program.model.compressedGraph.NodeData;
+import program.model.graph.EdgeData;
+import program.model.graph.NodeData;
 import program.model.mathStatement.MathStatement;
 import program.model.mathStatement.Problem;
 
@@ -111,7 +111,7 @@ public class LinearStatement {
                     boolean isSource = t.equals(e.getSource());
                     boolean isTarget = t.equals(e.getTarget());
                     String nodeType = n.getNodeType();
-                    System.out.println(nodeType);
+                    // System.out.println(nodeType);
                     if (isSource) {
                         if (s.endsWith("d")) {
                             min.add(0.0);

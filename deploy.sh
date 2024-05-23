@@ -26,7 +26,7 @@ cp settings.xml ~/.m2/settings.xml
 
 # Добавление библиотек в локальный репозиторий
 echo "Adding libraries to local Tomcat..."
-cd /cr4nkle/Tomcat
+cd ~/cr4nkle/Tomcat
 for file in../lib/*.jar; do
     groupId=$(echo "$file" | sed -e 's/.*\/\(.*\)\/.*\.jar/\1/')
     artifactId=$(basename "$file".jar)
@@ -36,7 +36,7 @@ done
 
 # Сборка проекта
 echo "Building project..."
-cd /cr4nkle/Tomcat
+cd ~/cr4nkle/Tomcat
 mvn clean:clean compile:compile war:war
 
 # Запуск Docker Compose

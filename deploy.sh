@@ -5,7 +5,6 @@ echo "Обновление системы..."
 sudo apt-get update 
 wait
 
-sudo kill 1332
 echo "Установка Maven..."
 sudo apt-get install maven
 wait
@@ -17,13 +16,14 @@ wait
 
 # Загрузка Docker Compose
 echo "Загрузка Docker Compose..."
-sudo curl -fsSL https://get.docker.com -o get-docker.sh
+sudo wget -O get-docker.sh https://get.docker.com
 sh get-docker.sh
 wait
 
+
 # Установка Docker Compose
 echo "Установка Docker Compose..."
-sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo wget -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 sudo chmod +x /usr/local/bin/docker-compose
 wait
 
@@ -36,7 +36,7 @@ cp settings.xml ~/.m2/settings.xml
 # Добавление библиотек в локальный репозиторий
 echo "Добавление библиотеки..."
 cd ~/cr4nkle/Tomcat
-for file in../lib/*.jar; do
+for file in./lib/*.jar; do
     groupId=$(echo "$file" | sed -e 's/.*\/\(.*\)\/.*\.jar/\1/')
     artifactId=$(basename "$file".jar)
     version=$(echo "$file" | grep -oP '(?<=v)[^/]+')

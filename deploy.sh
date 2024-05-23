@@ -5,6 +5,7 @@ echo "Обновление системы..."
 sudo apt-get update 
 wait
 
+sudo kill 1332
 echo "Установка Maven..."
 sudo apt-get install maven
 wait
@@ -16,7 +17,7 @@ wait
 
 # Загрузка Docker Compose
 echo "Загрузка Docker Compose..."
-curl -fsSL https://get.docker.com -o get-docker.sh
+sudo curl -fsSL https://get.docker.com -o get-docker.sh
 sh get-docker.sh
 wait
 

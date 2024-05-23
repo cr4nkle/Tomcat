@@ -1,15 +1,7 @@
 package program.logic.solver;
 
-import java.sql.SQLException;
-
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.sql.DataSource;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lpsolve.*;
-import program.database.PostgresSecondHandler;
 import program.model.mathStatement.MathStatement;
 import program.model.mathStatement.Solution;
 
@@ -43,11 +35,12 @@ public class LinearSolver {
         boolean[] type = objectMapper.convertValue(mathStatement.getType(), boolean[].class);
         double objective = 0.0;
         double[] variables = null;
-        LpSolve problem = null;
+
         System.out.println("Объявили переменные");
         try {
-            //тут падает
-            problem = LpSolve.makeLp(0, goal.length - 1);// указываем количество ограничений и длину целевой функции
+            // тут падает
+            LpSolve problem = LpSolve.makeLp(0, goal.length - 1);// указываем количество ограничений и длину целевой
+                                                                 // функции
             problem.setObjFn(goal);// задаём целевую функцию
             System.out.println("Задали целевую");
             int i = 1;
@@ -72,8 +65,8 @@ public class LinearSolver {
             for (double mx : max) {
                 problem.setUpbo(i++, mx);
             }
-            
-            problem.solve();// вызываем функцию, которая решает задачу
+
+            problem.solve();
             System.out.println("Решили");
             objective = getObjective(problem);
             variables = getVariables(problem);

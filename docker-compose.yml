@@ -2,7 +2,7 @@ version: '3'
 services:
   tomcat:
     container_name: tomcat
-    image: tomcat:9.0.80-jre8
+    image: tomcat:9.0-jre8
     # build: ./
     ports:
       - "8080:8080"

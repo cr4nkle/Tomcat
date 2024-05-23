@@ -1,12 +1,16 @@
 package program;
 
 import program.logic.xml.XmlGenerator;
+import program.model.graph.EdgeData;
+import program.model.graph.NodeData;
 import program.model.locale.ModalConfig;
 import program.utils.Constant;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.ws.rs.core.Response;
 
@@ -17,54 +21,59 @@ public class Main {
     public static void main(String[] args) throws IOException {
         // XmlGenerator xmlGenerator = new XmlGenerator();
         // xmlGenerator.generate();
-        ObjectMapper objectMapper = new ObjectMapper();
-        ModalConfig result;
-        try {
-            InputStream inputStream = Main.class.getClassLoader().getResourceAsStream(Constant.RU_LOCALE_PATH);
-            if (inputStream == null) {
-                throw new FileNotFoundException("File not found: " + Constant.RU_LOCALE_PATH);
-            }
-            
-            result = objectMapper.readValue(inputStream, ModalConfig.class);
-            System.out.println(result);
-        } catch (IOException e) {
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        ModalConfig result;
+//        try {
+//            InputStream inputStream = Main.class.getClassLoader().getResourceAsStream(Constant.RU_LOCALE_PATH);
+//            if (inputStream == null) {
+//                throw new FileNotFoundException("File not found: " + Constant.RU_LOCALE_PATH);
+//            }
+//
+//            result = objectMapper.readValue(inputStream, ModalConfig.class);
+//            System.out.println(result);
+//        } catch (IOException e) {
+//
+//            System.err.println("Failed to read JSON from " + Constant.RU_LOCALE_PATH + ": " + e.getMessage());
+//
+//        }
+        ArrayList<String> first = new ArrayList<>();
+        ArrayList<String> second = new ArrayList<>();
+        first.add("n1");
+        first.add("n2");
+        first.add("n3");
+        first.add("n4");
+        first.add("lim");
 
-            System.err.println("Failed to read JSON from " + Constant.RU_LOCALE_PATH + ": " + e.getMessage());
-    
-        }
-//        ArrayList<String> first = new ArrayList<>();
-//        ArrayList<String> second = new ArrayList<>();
-//        first.add("n1");
-//        first.add("n2");
-//        first.add("n3");
-//        first.add("n4");
-//        first.add("lim");
-//
-//        second.add("e12");
-//        second.add("e23");
-//        second.add("e24");
-//        second.add("sign");
-//        second.add("lim");
-//
-//        NodeData node1 = new NodeData("source", 2, 20, 5, 0, 0, "heat", true, 0.95f);
-//        NodeData node3 = new NodeData("consumer", 0, 0, 0, 0, 2, "heat", false, 0.95f);
-//        NodeData node4 = new NodeData("consumer", 0, 0, 0, 0, 3, "heat", false, 0.95f);
-//        NodeData node5 = new NodeData("connector", 0, 0, 0, 0, 0, "heat", false, 0.95f);
-//
-//        EdgeData edge1 = new EdgeData("heat", 5, 0, 0, 10.0, "n1", "n2");
-//        EdgeData edge3 = new EdgeData("heat", 3, 0, 0, 14.0, "n2", "n3");
-//        EdgeData edge4 = new EdgeData("heat", 4, 0, 0, 17.0, "n2", "n4");
-//
-//        HashMap<String, NodeData> node = new HashMap<>();
-//        HashMap<String, EdgeData> edge = new HashMap<>();
-//        node.put("n1", node1);
-//        node.put("n2", node5);
-//        node.put("n3", node3);
-//        node.put("n4", node4);
-//
-//        edge.put("e12", edge1);
-//        edge.put("e23", edge3);
-//        edge.put("e24", edge4);
+        second.add("e12");
+        second.add("e23");
+        second.add("e24");
+        second.add("sign");
+        second.add("lim");
+
+        NodeData node1 = new NodeData("source", 2, 20, 5, 0, 0, "heat", true, 0.95f);
+        NodeData node3 = new NodeData("consumer", 0, 0, 0, 0, 2, "heat", false, 0.95f);
+        NodeData node4 = new NodeData("consumer", 0, 0, 0, 0, 3, "heat", false, 0.95f);
+        NodeData node5 = new NodeData("connector", 0, 0, 0, 0, 0, "heat", false, 0.95f);
+
+        EdgeData edge1 = new EdgeData("heat", 5, 0, 0, 10.0, "n1", "n2");
+        EdgeData edge3 = new EdgeData("heat", 3, 0, 0, 14.0, "n2", "n3");
+        EdgeData edge4 = new EdgeData("heat", 10, 0, 0, 17.0, "n2", "n4");
+        EdgeData edge5 = new EdgeData("heat", 10, 0, 0, 17.0, "n1", "n2");
+        EdgeData edge6 = new EdgeData("heat", 2, 0, 0, 17.0, "n1", "n2");
+
+        HashMap<String, NodeData> node = new HashMap<>();
+        HashMap<String, EdgeData> edge = new HashMap<>();
+        node.put("n1", node1);
+        node.put("n2", node5);
+        node.put("n3", node3);
+        node.put("n4", node4);
+
+        edge.put("e12", edge1);
+        edge.put("e12c", edge5);
+        edge.put("e12cc", edge6);
+        edge.put("e23", edge3);
+        edge.put("e24", edge4);
+
 //
 //        LocalTime time1 = LocalTime.now();
 ////        ArrayList<ArrayList<Double>> matrix = new ArrayList<>();

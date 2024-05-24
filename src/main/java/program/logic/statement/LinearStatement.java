@@ -146,7 +146,7 @@ public class LinearStatement {
         task1.join();
         task2.join();
         MathStatement mathStatement = new MathStatement(lim, max, min, goal, matrix, sign, type);
-        System.out.println(mathStatement);
+//        System.out.println(mathStatement);
         return mathStatement;
     }
 }

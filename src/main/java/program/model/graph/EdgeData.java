@@ -22,6 +22,8 @@ public class EdgeData {
     private String source;
     @JsonProperty("target")
     private String target;
+    @JsonProperty("installed")
+    private boolean installed;
 
     public EdgeData() {
 
@@ -35,7 +37,8 @@ public class EdgeData {
             @JsonProperty("cost") int cost,
             @JsonProperty("length") double length,
             @JsonProperty("source") String source,
-            @JsonProperty("target") String target) {
+            @JsonProperty("target") String target,
+            @JsonProperty("installed") boolean installed) {
         this.cost = cost;
         this.systemType = systemType;
         this.length = length;
@@ -43,6 +46,7 @@ public class EdgeData {
         this.throughput = throughput;
         this.resistance = resistance;
         this.target = target;
+        this.installed = installed;
     }
 
     public int getCost() {
@@ -99,6 +103,14 @@ public class EdgeData {
 
     public double getLength() {
         return length;
+    }
+
+    public boolean isInstalled() {
+        return installed;
+    }
+
+    public void setInstalled(boolean installed) {
+        this.installed = installed;
     }
 
     @Override

@@ -1,9 +1,6 @@
 package program.model.mathStatement;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
 
 import java.util.ArrayList;
 
@@ -24,6 +21,8 @@ public class MathStatement {
     private ArrayList<Integer> sign;
     @JsonProperty("type")
     private ArrayList<Boolean> type;
+    @JsonIgnore
+    private int count;
 
     public MathStatement() {
     }
@@ -44,6 +43,25 @@ public class MathStatement {
         this.matrix = matrix;
         this.sign = sign;
         this.type= type;
+    }
+
+    public MathStatement(
+            ArrayList<Double> lim,
+            ArrayList<Double> max,
+            ArrayList<Double> min,
+            ArrayList<Double> goal,
+            ArrayList<ArrayList<Double>> matrix,
+            ArrayList<Integer> sign,
+            ArrayList<Boolean> type,
+            int count) {
+        this.lim = lim;
+        this.min = min;
+        this.max = max;
+        this.goal = goal;
+        this.matrix = matrix;
+        this.sign = sign;
+        this.type= type;
+        this.count = count;
     }
 
     public void setMin(ArrayList<Double> min) {
@@ -100,6 +118,14 @@ public class MathStatement {
 
     public ArrayList<Double> getLim() {
         return lim;
+    }
+
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
     }
 
     @Override

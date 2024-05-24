@@ -16,7 +16,7 @@ import java.io.File;
 
 public class XmlGenerator {
 
-    public void generate() {
+    public void generate(String model, String data) {
         try {
             // Создание документа
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -50,12 +50,12 @@ public class XmlGenerator {
 
             // Добавление элемента model
             Element modelElement = document.createElement("model");
-            modelElement.setTextContent("ВАШИ МОДЕЛЬНЫЕ ДАННЫЕ ЗДЕСЬ");
+            modelElement.setTextContent(model);
             rootElement.appendChild(modelElement);
 
             // Добавление элемента data
             Element dataElement = document.createElement("data");
-            dataElement.setTextContent("ВАШИ ДАННЫЕ ЗДЕСЬ");
+            dataElement.setTextContent(data);
             rootElement.appendChild(dataElement);
 
             // Добавление элемента commands

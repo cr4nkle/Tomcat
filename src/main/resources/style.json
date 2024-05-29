@@ -1,19 +1,9 @@
 {
   "style": [
     {
-      "selector": "node",
+      "selector": "edge:selected",
       "style": {
-        "label": "data(name)",
-        "font-size": "10px"
-      }
-    },
-    {
-      "selector": "node[grouped = \"true\"]",
-      "style": {
-        "label": "data(group_name)",
-        "border-width": "3px",
-        "border-color": "rgb(66,170,255)",
-        "border-opacity": "1"
+        "line-style": "dashed"
       }
     },
     {
@@ -38,6 +28,15 @@
       }
     },
     {
+      "selector": "node[grouped = \"true\"]",
+      "style": {
+        "label": "data(group_name)",
+        "border-width": "3px",
+        "border-color": "rgb(66,170,255)",
+        "border-opacity": "1"
+      }
+    },
+    {
       "selector": "node:locked",
       "style": {
         "border-width": "6px",
@@ -47,11 +46,13 @@
       }
     },
     {
-      "selector": "edge:selected",
+      "selector": "node",
       "style": {
-        "line-style": "dashed"
+        "label": "data(name)",
+        "font-size": "10px"
       }
     },
+
     {
       "selector": "node[node_type = \"source\"]",
       "style": {

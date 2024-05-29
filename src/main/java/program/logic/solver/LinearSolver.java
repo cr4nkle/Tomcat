@@ -12,7 +12,7 @@ public class LinearSolver {
     }
 
     public static LinearSolver getInstance() {
-        System.out.println("Делаем солвер");
+        // System.out.println("Делаем солвер");
         if (INSTANCE == null) {
             synchronized (LinearSolver.class) {
                 if (INSTANCE == null) {
@@ -24,7 +24,7 @@ public class LinearSolver {
     }
 
     public Solution optimate(MathStatement mathStatement) {
-        System.out.println("Решаем");
+        // System.out.println("Решаем");
         ObjectMapper objectMapper = new ObjectMapper();
         double[][] matrix = objectMapper.convertValue(mathStatement.getMatrix(), double[][].class);
         double[] goal = objectMapper.convertValue(mathStatement.getGoal(), double[].class);
@@ -36,49 +36,49 @@ public class LinearSolver {
         double objective = 0.0;
         double[] variables = null;
 
-        System.out.println("Объявили переменные");
+        // System.out.println("Объявили переменные");
         try {
             // тут падает
             LpSolve problem = LpSolve.makeLp(0, goal.length - 1);// указываем количество ограничений и длину целевой
                                                                  // функции
             problem.setObjFn(goal);// задаём целевую функцию
-            System.out.println("Задали целевую");
+            // System.out.println("Задали целевую");
             int i = 1;
             for (boolean b : type) {
                 problem.setInt(i++, b);
             }
-            System.out.println("1");
+            // System.out.println("1");
             if (matrix != null) {
                 // ограничения в виде неравенств
                 for (int j = 0; j < matrix.length; j++) {
                     problem.addConstraint(matrix[j], sign[j], lim[j]);
                 }
             }
-            System.out.println("2");
+            // System.out.println("2");
             // накладываем ограничения на переменные
             i = 1;
             for (double mn : min) {
                 problem.setLowbo(i++, mn);
             }
-            System.out.println("3");
+            // System.out.println("3");
             i = 1;
             for (double mx : max) {
                 problem.setUpbo(i++, mx);
             }
 
             problem.solve();
-            System.out.println("Решили");
+            // System.out.println("Решили");
             objective = getObjective(problem);
             variables = getVariables(problem);
-            System.out.println("Нашли переменные");
+            // System.out.println("Нашли переменные");
             deleteProblem(problem);
-            System.out.println("Задали целевую");
+            // System.out.println("Задали целевую");
         } catch (Exception exception) {
             System.out.println(exception.getMessage());
         }
-        System.out.println("Возвращаем");
+        // System.out.println("Возвращаем");
         Solution solution = new Solution(mathStatement, objective, variables);
-        System.out.println(solution.getObjective());
+        // System.out.println(solution.getObjective());
         return solution;
     }
 

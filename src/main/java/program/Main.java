@@ -17,13 +17,18 @@ import program.utils.Constant;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.Duration;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.ws.rs.core.Response;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -33,12 +38,12 @@ public class Main {
         first.add("n2");
         first.add("n3");
         first.add("n4");
-//        first.add("lim");
+        // first.add("lim");
 
         second.add("e12");
         second.add("e12c");
         second.add("e12cc");
-        second.add("e12ccc");
+        second.add("e12ccd");
         second.add("e23");
         second.add("e24");
         second.add("sign");
@@ -68,34 +73,160 @@ public class Main {
         edge.put("e12", edge1);
         edge.put("e12c", edge5);
         edge.put("e12cc", edge6);
-        edge.put("e12ccc", edge7);
+        edge.put("e12ccd", edge7);
         edge.put("e23", edge3);
         edge.put("e24", edge4);
 
-        Problem problem = new Problem();
-        problem.setNodeId(first);
-        problem.setEdgeId(second);
-        problem.setEdge(edge);
-        problem.setNode(node);
+        LocalTime time1 = LocalTime.now();
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-        String str = objectMapper.writeValueAsString(problem);
-        System.out.println(str);
+        ArrayList<ArrayList<Double>> matrix = new ArrayList<>();
+        ArrayList<Double> lim = new ArrayList<>();
+        ArrayList<Integer> sign = new ArrayList<>();
+        ArrayList<Double> min = new ArrayList<>();
+        ArrayList<Double> max = new ArrayList<>();
+        ArrayList<Double> goal = new ArrayList<>();
+        ArrayList<Boolean> type = new ArrayList<>();
 
-        MathStatement mathStatement = NonLinearStatement.getNonLinearStatement(problem);
-        str = objectMapper.writeValueAsString(mathStatement);
-        System.out.println(str);
+        CompletableFuture<Void> task1 = CompletableFuture.runAsync(() -> {
+            first.forEach(f -> {
+                ArrayList<Double> row = new ArrayList<>();
+                row.add(0.0);
+                second.forEach(s -> {
+                    if (node.containsKey(f)) {
+                        double v = 0;
+                        NodeData n = node.get(f);
+                        String nodeType = n.getNodeType();
+                        float h = 1.0f;
 
+                        switch (s) {
+                            case "sign":
+                                v = (!nodeType.equals("source")) ? 3 : 1;
+                                sign.add((int) v);
+                                break;
+                            case "lim":
+                                if (!nodeType.equals("source")) {
+                                    v = -n.getLoad();
+                                } else if (nodeType.equals("source") && n.isInstalled()) {
+                                    v = n.getMaxGen();
+                                } else {
+                                    v = 0;
+                                }
+                                lim.add(v);
+                                break;
+                            default:
+                                EdgeData e = edge.get(s);
+                                boolean isSource = f.equals(e.getSource());
+                                boolean isTarget = f.equals(e.getTarget());
+                                if (isSource) {
+                                    v = s.endsWith("d") ? -n.getMaxGen() : 1;
+                                } else if (isTarget) {
+                                    if (nodeType.equals("source")) {
+                                        h = n.getEfficiency();
+                                        BigDecimal bd = new BigDecimal(Float.toString(-1 * h));
+                                        BigDecimal rounded = bd.setScale(2, RoundingMode.HALF_UP);
+                                        double doubleValue = rounded.doubleValue();
+                                        v = s.endsWith("d") ? -n.getMaxGen() : doubleValue;
+                                    } else {
+                                        v = s.endsWith("d") ? 0 : -1;
+                                    }
 
-        Solution solution = LinearSolver.getInstance().optimate(mathStatement);
-        str = objectMapper.writeValueAsString(solution);
-        System.out.println(str);
-        String model = NonLinearStatement.convertModel(mathStatement);
-        String data = NonLinearStatement.convertData(mathStatement);
-        XmlGenerator xmlGenerator = new XmlGenerator();
+                                }
+                                row.add(v);
+                                break;
+                        }
+                    } else {
+                        switch (s) {
+                            case "sign":
+                                lim.add(1.0);
+                                break;
+                            case "lim":
+                                sign.add(1);
+                                break;
+                            default:
+                                row.add(s.endsWith("d") ? 1.0 : 0.0);
+                                break;
+                        }
+                    }
+                });
+                matrix.add(row);
+            });
+        });
+        second.remove(second.size() - 1);
+        second.remove(second.size() - 1);
+        first.remove(first.size() - 1);
 
-//        xmlGenerator.generate(model, data);
-        NeosClient.getInstance().submitProblem("C:/Users/cr4nk/IdeaProjects/Tomcat/output.xml");
+        CompletableFuture<Void> task2 = CompletableFuture.runAsync(() -> {
+            second.forEach(s -> {
+                EdgeData e = edge.get(s);
+                AtomicBoolean isInstalled = new AtomicBoolean(false);
+
+                first.forEach(t -> {
+                    NodeData n = node.get(t);
+
+                    boolean isSource = t.equals(e.getSource());
+                    boolean isTarget = t.equals(e.getTarget());
+                    String nodeType = n.getNodeType();
+                    // System.out.println(nodeType);
+                    if (isSource) {
+                        if (s.endsWith("d")) {
+                            min.add(0.0);
+                            max.add(1.0);
+                            type.add(true);
+                            goal.add((double) n.getCost());
+                            isInstalled.set(true);
+                        } else if (nodeType.equals("source")) {
+                            goal.add((double) n.getPrice());
+                            type.add(false);
+                        }
+                    } else if (isTarget) {
+                        if (nodeType.equals("consumer")) {
+                            goal.add((double) n.getCost());
+                            type.add(false);
+                        } else if (nodeType.equals("source") && !s.endsWith("d")) {
+                            goal.add((double) n.getPrice());
+                            type.add(false);
+                        }
+                    }
+
+                });
+
+                if (!isInstalled.get()) {
+                    min.add(0.0);
+                    max.add((double) e.getThroughput());
+                }
+            });
+        });
+
+        task1.join();
+        task2.join();
+
+        LocalTime time2 = LocalTime.now();
+        Duration duration = Duration.between(time1, time2);
+        System.out.println(duration.toMillis() + " миллисекунд");
+        // Problem problem = new Problem();
+        // problem.setNodeId(first);
+        // problem.setEdgeId(second);
+        // problem.setEdge(edge);
+        // problem.setNode(node);
+
+        // ObjectMapper objectMapper = new ObjectMapper();
+        // objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        // String str = objectMapper.writeValueAsString(problem);
+        // System.out.println(str);
+
+        // MathStatement mathStatement =
+        // NonLinearStatement.getNonLinearStatement(problem);
+        // str = objectMapper.writeValueAsString(mathStatement);
+        // System.out.println(str);
+
+        // Solution solution = LinearSolver.getInstance().optimate(mathStatement);
+        // str = objectMapper.writeValueAsString(solution);
+        // System.out.println(str);
+        // String model = NonLinearStatement.convertModel(mathStatement);
+        // String data = NonLinearStatement.convertData(mathStatement);
+        // XmlGenerator xmlGenerator = new XmlGenerator();
+
+        // xmlGenerator.generate(model, data);
+        // NeosClient.getInstance().submitProblem("C:/Users/cr4nk/IdeaProjects/Tomcat/output.xml");
     }
 }

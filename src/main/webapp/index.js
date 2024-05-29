@@ -1,6 +1,7 @@
 const hostName = "http://localhost:8080";
 const localeUrl = `${hostName}/app/rest/get/locale`;
 let selectedObjectsIds = [];
+let isModelSave = true;
 
 // Функция для получения элемента по его id
 const getElement = (id) => document.getElementById(id);
@@ -78,7 +79,7 @@ const elements = {
   resultModalText: getElement("resultModalText"),
 
   waterNodeModalCheckboxText: getElement("waterNodeModalCheckboxText"),
-  poverNodeModalCheckboxText: getElement("poverNodeModalCheckboxText"),
+  powerNodeModalCheckboxText: getElement("powerNodeModalCheckboxText"),
   fuelNodeModalCheckboxText: getElement("fuelNodeModalCheckboxText"),
   heatNodeModalCheckboxText: getElement("heatNodeModalCheckboxText"),
   blockNodeModalCheckboxText: getElement("blockNodeModalCheckboxText"),
@@ -149,7 +150,7 @@ loadDataFromServer(localeUrl)
 
     elements.waterNodeModalCheckboxText.textContent =
       data.nodeModal.checkboxes.water;
-    elements.poverNodeModalCheckboxText.textContent =
+    elements.powerNodeModalCheckboxText.textContent =
       data.nodeModal.checkboxes.power;
     elements.fuelNodeModalCheckboxText.textContent =
       data.nodeModal.checkboxes.fuel;
@@ -164,10 +165,11 @@ loadDataFromServer(localeUrl)
 
 elements.startModal.showModal();
 
-//вывод окна с сообщением
+// Функция showMessage, адаптированная под механизм переключения слушателей
 const showMessage = (text) => {
   elements.modalText.textContent = text;
   elements.messageModal.showModal();
+
   elements.messageModalCloseBtn.addEventListener("click", () => {
     elements.messageModal.close();
   });
@@ -183,7 +185,8 @@ let cy = null;
 let addEdgeOn = false,
   addNodeOn = false,
   editModeOn = false,
-  delModeOn = false;
+  delModeOn = false,
+  moveModeOn = true;
 let nodeType;
 let nodeId = 1;
 let edgeId;
@@ -210,25 +213,31 @@ elements.newModelBtn.addEventListener("click", () => {
 
 //нажатие кнопки создать модель
 elements.createModelBtn.addEventListener("click", async () => {
-  elements.newModelModal.close();
-  modelName = elements.newModelNameInput.value;
-
-  if (modelName) {
-    // Если пользователь ввел название, выводим его в диалоговом окне
-    showMessage(`Вы ввели: ${modelName}`);
-    // Инициализируем пустой граф и применяем к нему методы
-    cy = await initializeEmptyGraph(cyProperties);
-    initializeGraphMethods(cy);
-  } else {
-    // Если пользователь отменил ввод, выводим сообщение
-    showMessage("Вы ничего не ввели!!!");
-
+  if (isModelSave) {
     elements.newModelModal.close();
-    elements.newModelNameInput.value = "";
-    elements.newModelModal.showModal();
-  }
+    modelName = elements.newModelNameInput.value;
 
-  elements.newModelNameInput.value = "";
+    if (modelName) {
+      // Если пользователь ввел название, выводим его в диалоговом окне
+      showMessage(`Вы ввели: ${modelName}`);
+      // Инициализируем пустой граф и применяем к нему методы
+
+      cy = await initializeEmptyGraph(cyProperties);
+      initializeGraphMethods(cy);
+      isModelSave = false;
+    } else {
+      // Если пользователь отменил ввод, выводим сообщение
+      showMessage("Вы ничего не ввели!!!");
+
+      elements.newModelModal.close();
+      elements.newModelNameInput.value = "";
+      elements.newModelModal.showModal();
+    }
+
+    elements.newModelNameInput.value = "";
+  } else {
+    showMessage("Вы не сохранили модель!!");
+  }
 });
 
 //открыть из бд в тулбаре
@@ -266,26 +275,34 @@ elements.openChooseModelModalToolbarBtn.addEventListener("click", async () => {
 
   //нажатие на кнопку для выбора модели
   elements.openModelBtn.addEventListener("click", async () => {
-    if (selectedModel) {
-      showMessage(`Выбранная модель: ${selectedModel.textContent}`);
-      elements.chooseModelModal.close();
-      // Запрашиваем у пользователя название модели через диалоговое окно
-      modelName = selectedModel.textContent;
+    if (isModelSave) {
+      if (selectedModel) {
+        cy = null;
+        modelName = null;
+        showMessage(`Выбранная модель: ${selectedModel.textContent}`);
+        elements.chooseModelModal.close();
+        // Запрашиваем у пользователя название модели через диалоговое окно
+        modelName = selectedModel.textContent;
 
-      if (modelName) {
-        // Если пользователь ввел название, выводим его в диалоговом окне
-        showMessage(`Вы ввели: ${modelName}`);
+        if (modelName) {
+          // Если пользователь ввел название, выводим его в диалоговом окне
+          showMessage(`Вы ввели: ${modelName}`);
+        } else {
+          // Если пользователь отменил ввод, выводим сообщение
+          showMessage("Ввод отменен");
+        }
+        // Создаем URL для запроса к серверу с именем модели
+        let url = `${hostName}/app/rest/get/model?name=${modelName}`;
+        // Инициализируем граф с данными из сервера
+
+        cy = await initializeGraph(new Request(url), cyProperties);
+        initializeGraphMethods(cy);
+        isModelSave = false;
       } else {
-        // Если пользователь отменил ввод, выводим сообщение
-        showMessage("Ввод отменен");
+        showMessage("Модель не выбрана");
       }
-      // Создаем URL для запроса к серверу с именем модели
-      let url = `${hostName}/app/rest/get/model?name=${modelName}`;
-      // Инициализируем граф с данными из сервера
-      cy = await initializeGraph(new Request(url), cyProperties);
-      initializeGraphMethods(cy);
     } else {
-      showMessage("Модель не выбрана");
+      showMessage("Вы не сохранили модель!!");
     }
   });
 });
@@ -325,46 +342,64 @@ elements.openChooseModelModalBtn.addEventListener("click", async () => {
 
   //нажатие на кнопку для выбора модели
   elements.openModelBtn.addEventListener("click", async () => {
-    if (selectedModel) {
-      showMessage(`Выбранная модель: ${selectedModel.textContent}`);
-      elements.chooseModelModal.close();
-      // Запрашиваем у пользователя название модели через диалоговое окно
-      modelName = selectedModel.textContent;
+    if (isModelSave) {
+      if (selectedModel) {
+        showMessage(`Выбранная модель: ${selectedModel.textContent}`);
+        elements.chooseModelModal.close();
+        // Запрашиваем у пользователя название модели через диалоговое окно
+        modelName = selectedModel.textContent;
 
-      if (modelName) {
-        // Если пользователь ввел название, выводим его в диалоговом окне
-        showMessage(`Вы ввели: ${modelName}`);
+        if (modelName) {
+          // Если пользователь ввел название, выводим его в диалоговом окне
+          showMessage(`Вы ввели: ${modelName}`);
+        } else {
+          // Если пользователь отменил ввод, выводим сообщение
+          showMessage("Ввод отменен");
+        }
+        // Создаем URL для запроса к серверу с именем модели
+        let url = `${hostName}/app/rest/get/model?name=${modelName}`;
+        // Инициализируем граф с данными из сервера
+
+        cy = await initializeGraph(new Request(url), cyProperties);
+        initializeGraphMethods(cy);
+        isModelSave = false;
       } else {
-        // Если пользователь отменил ввод, выводим сообщение
-        showMessage("Ввод отменен");
+        showMessage("Модель не выбрана");
       }
-      // Создаем URL для запроса к серверу с именем модели
-      let url = `${hostName}/app/api/get/model?name=${modelName}`;
-      // Инициализируем граф с данными из сервера
-      cy = await initializeGraph(new Request(url), cyProperties);
-      initializeGraphMethods(cy);
     } else {
-      showMessage("Модель не выбрана");
+      showMessage("Вы не сохранили модель!!");
     }
   });
 });
 
 //открытие модели с компьютера
 elements.uploadInput.addEventListener("change", async (event) => {
-  elements.startModal.close();
-  // Получаем выбранный файл
-  var file = event.target.files[0];
-  // Устанавливаем имя модели равным имени файла
-  modelName = file.name;
-  // Создаем URL для доступа к файлу
-  let url = URL.createObjectURL(file);
-  // Инициализируем граф с данными из файла
-  cy = await initializeGraph(new Request(url), cyProperties);
-  initializeGraphMethods(cy);
-  // Удаляем расширение из имени файла
-  modelName = removeExtension(modelName);
-  // Выводим сообщение с именем загруженной модели
-  showMessage(`Вы открыли модель: ${modelName}`);
+  if (isModelSave) {
+    elements.startModal.close();
+    // Получаем выбранный файл
+    var file = event.target.files[0];
+    if (!file.name.endsWith(".json")) {
+      showMessage("Пожалуйста, выберите файл формата JSON!");
+      // elements.startModal.showModal();
+      return; // Прерываем выполнение, если файл не JSON
+    }
+    // Устанавливаем имя модели равным имени файла
+    modelName = file.name;
+    // Создаем URL для доступа к файлу
+    let url = URL.createObjectURL(file);
+    // Инициализируем граф с данными из файла
+
+    cy = await initializeGraph(new Request(url), cyProperties);
+    initializeGraphMethods(cy);
+    isModelSave = false;
+
+    // Удаляем расширение из имени файла
+    modelName = removeExtension(modelName);
+    // Выводим сообщение с именем загруженной модели
+    showMessage(`Вы открыли модель: ${modelName}`);
+  } else {
+    showMessage("Вы не сохранили модель!!");
+  }
 });
 
 //скачивание файла
@@ -386,6 +421,7 @@ elements.saveToDeviceToolbarBtn.addEventListener("click", () => {
     link.download = modelName;
     // Инициируем скачивание
     link.click();
+    isModelSave = true;
   } else {
     showMessage("Модель не создана");
   }
@@ -394,7 +430,7 @@ elements.saveToDeviceToolbarBtn.addEventListener("click", () => {
 //соханяем в базу данных
 elements.saveToDataWarehouseToolbarBtn.addEventListener("click", async () => {
   if (cy !== null) {
-    let url = `${hostName}/app/rest/post/saveModel`;
+    let url = `${hostName}/app/rest/post/save`;
     // Получаем JSON представление графа
     let graphJSON = cy.json();
     // Получаем идентификаторы всех ребер
@@ -413,9 +449,11 @@ elements.saveToDataWarehouseToolbarBtn.addEventListener("click", async () => {
     // Преобразуем JSON в строку
     console.log(graphJSON);
     let data = JSON.stringify(graphJSON);
-    showMessage("Модель сохранена");
+
     // Отправляем данные на сервер для сохранения модели
     let result = await loadDataOnServer(url, data, "POST");
+    isModelSave = true;
+    showMessage("Модель сохранена");
     console.log(result);
   }
 });
@@ -487,100 +525,111 @@ elements.hideCheckboxes.forEach((checkbox) => {
 });
 //---------------------------------------------остановился пока тут
 // Операции
-
 const operationButtons = [
   elements.addEdgeToolbarBtn,
   elements.addNodeToolbarBtn,
   elements.editToolbarBtn,
   elements.deleteItemToolbarBtn,
-  elements.calculateToolbarBtn,
   elements.moveToolbarBtn,
 ];
 
-function toggleButtons(enable, buttons) {
+function toggleMoveBtn(buttons) {
+  let hasSelectedClass = false;
+
+  // Проходим по всем кнопкам и проверяем наличие класса 'selected'
+  for (let button of operationButtons) {
+    if (button.classList.contains("selected")) {
+      hasSelectedClass = true;
+      break; // Прекращаем цикл, так как достаточно одной кнопки с классом 'selected'
+    }
+  }
+
+  // Если ни одна кнопка не имеет класса 'selected', добавляем его к элементу moveToolbarBtn
+  if (!hasSelectedClass) {
+    elements.moveToolbarBtn.classList.add("selected");
+  } else {
+    // Если хотя бы одна кнопка имеет класс 'selected', удаляем его у элемента moveToolbarBtn
+    elements.moveToolbarBtn.classList.remove("selected");
+  }
+}
+function toggleMode(modeFlag, enable) {
+  if (modeFlag === "addNode") {
+    addNodeOn = enable;
+    delModeOn = false;
+    moveModeOn = false;
+    addEdgeOn = false;
+    editModeOn = false;
+  } else if (modeFlag === "addEdge") {
+    addEdgeOn = !enable;
+    addNodeOn = false;
+    delModeOn = false;
+    moveModeOn = false;
+    editModeOn = false;
+  } else if (modeFlag === "editMode") {
+    editModeOn = !enable;
+    delModeOn = false;
+    moveModeOn = false;
+    addEdgeOn = false;
+    addNodeOn = false;
+  } else if (modeFlag === "delMode") {
+    delModeOn = !enable;
+    moveModeOn = false;
+    addEdgeOn = false;
+    editModeOn = false;
+    addNodeOn = false;
+  } else if (modeFlag === "moveMode") {
+    moveModeOn = enable;
+    editModeOn = false;
+    editModeOn = false;
+    delModeOn = false;
+    addNodeOn = false;
+  }
+}
+
+function toggleButtons(enable, buttons, modeFlag) {
   removeSelectedClass(buttons);
   buttons.forEach((button) => {
     button.disabled = !enable;
   });
+  toggleMode(modeFlag, enable);
 }
 
-function toggleSelected(isSelected, element) {
+function toggleSelected(isSelected, element, modeFlag) {
   removeSelectedClass([...operationButtons, ...elementButtons]);
   if (isSelected) {
     element.classList.remove("selected");
   } else {
     element.classList.add("selected");
   }
+  toggleMode(modeFlag, isSelected);
 }
-
-let isFirstClick = true;
 
 elements.addEdgeToolbarBtn.addEventListener("click", () => {
   const isSelected = elements.addEdgeToolbarBtn.classList.contains("selected");
-  toggleButtons(false, elementButtons);
-  toggleSelected(isSelected, elements.addEdgeToolbarBtn);
+  toggleButtons(false, elementButtons, "addEdge");
+  toggleSelected(isSelected, elements.addEdgeToolbarBtn, "addEdge");
+  toggleMoveBtn(elementButtons);
 
-  if (isFirstClick) {
-    // При первом нажатии включаем режим редактирования
-    setModeValue(false, true, false, false);
-    isFirstClick = false; // Устанавливаем флаг в false, чтобы следующее нажатие вызвало другую функцию
-  } else {
-    // При втором нажатии сбрасываем режим редактирования
-    setModeValue(false, false, false, false);
-    isFirstClick = true; // Сбрасываем флаг, чтобы при следующем нажатии снова вызывалась первая функция
-  }
-
-  // Сбрасываем выбранные элементы
   selectedNode = null;
   selectedEdge = null;
 });
 
 elements.addNodeToolbarBtn.addEventListener("click", () => {
-  // // Получаем коллекцию всех элементов
-  // var allElements = cy.elements();
-
-  // // Перебираем каждый элемент и удаляем выделение
-  // allElements.forEach(function (ele) {
-  //   // Проверяем, выделен ли элемент
-  //   if (ele.selected()) {
-  //     // Удаляем выделение
-  //     ele.deselect();
-  //   }
-  // });
-
   const isSelected = elements.addNodeToolbarBtn.classList.contains("selected");
-  toggleSelected(isSelected, elements.addNodeToolbarBtn);
-  toggleButtons(!isSelected, elementButtons);
+  toggleSelected(isSelected, elements.addNodeToolbarBtn, "addNode");
+  toggleButtons(!isSelected, elementButtons, "addNode");
+  toggleMoveBtn(elementButtons);
 
-  if (isFirstClick) {
-    // При первом нажатии включаем режим редактирования
-    setModeValue(true, false, false, false);
-    isFirstClick = false; // Устанавливаем флаг в false, чтобы следующее нажатие вызвало другую функцию
-  } else {
-    // При втором нажатии сбрасываем режим редактирования
-    setModeValue(false, false, false, false);
-    isFirstClick = true; // Сбрасываем флаг, чтобы при следующем нажатии снова вызывалась первая функция
-  }
-  // Сбрасываем выбранные элементы
   selectedNode = null;
   selectedEdge = null;
 });
 
 elements.editToolbarBtn.addEventListener("click", () => {
   const isSelected = elements.editToolbarBtn.classList.contains("selected");
-  toggleButtons(false, elementButtons);
-  toggleSelected(isSelected, elements.editToolbarBtn);
+  toggleButtons(false, elementButtons, "editMode");
+  toggleSelected(isSelected, elements.editToolbarBtn, "editMode");
+  toggleMoveBtn(elementButtons);
 
-  if (isFirstClick) {
-    // При первом нажатии включаем режим редактирования
-    setModeValue(false, false, true, false);
-    isFirstClick = false; // Устанавливаем флаг в false, чтобы следующее нажатие вызвало другую функцию
-  } else {
-    // При втором нажатии сбрасываем режим редактирования
-    setModeValue(false, false, false, false);
-    isFirstClick = true; // Сбрасываем флаг, чтобы при следующем нажатии снова вызывалась первая функция
-  }
-  // Сбрасываем выбранные элементы
   selectedNode = null;
   selectedEdge = null;
 });
@@ -588,32 +637,19 @@ elements.editToolbarBtn.addEventListener("click", () => {
 elements.deleteItemToolbarBtn.addEventListener("click", () => {
   const isSelected =
     elements.deleteItemToolbarBtn.classList.contains("selected");
-  toggleButtons(false, elementButtons);
-  toggleSelected(isSelected, elements.deleteItemToolbarBtn);
+  toggleButtons(false, elementButtons, "delMode");
+  toggleSelected(isSelected, elements.deleteItemToolbarBtn, "delMode");
+  toggleMoveBtn(elementButtons);
 
-  if (isFirstClick) {
-    // При первом нажатии включаем режим редактирования
-    setModeValue(false, false, false, true);
-    isFirstClick = false; // Устанавливаем флаг в false, чтобы следующее нажатие вызвало другую функцию
-  } else {
-    // При втором нажатии сбрасываем режим редактирования
-    setModeValue(false, false, false, false);
-    isFirstClick = true; // Сбрасываем флаг, чтобы при следующем нажатии снова вызывалась первая функция
-  }
-
-  // Сбрасываем выбранные элементы
   selectedNode = null;
   selectedEdge = null;
 });
 
 elements.moveToolbarBtn.addEventListener("click", () => {
   const isSelected = elements.moveToolbarBtn.classList.contains("selected");
-  toggleButtons(false, elementButtons);
-  toggleSelected(isSelected, elements.moveToolbarBtn);
-  // Сбрасываем режимы работы
-  setModeValue(false, false, false, false);
+  toggleButtons(false, elementButtons, "moveMode");
+  toggleSelected(isSelected, elements.moveToolbarBtn, "moveMode");
 
-  // Сбрасываем выбранные элементы
   selectedNode = null;
   selectedEdge = null;
 });
@@ -633,10 +669,10 @@ elements.calculateToolbarBtn.addEventListener("click", async () => {
       return element.style("display") !== "none";
     });
 
-    const url = `${hostName}/app/rest/post/calculate`;
+    const url = `${hostName}/app/rest/post/calculate?type=nonlinear`;
     // Получаем данные проблемы для расчета
-    let problem = getLinearProblem(visibleElements);
-    // let nProblem = getNonLinearProblem(visibleElements);
+    // let problem = getLinearProblem(visibleElements);
+    let problem = getNonLinearProblem(visibleElements);
 
     // Преобразуем данные проблемы в JSON строку
     let data = JSON.stringify(problem);
@@ -644,6 +680,7 @@ elements.calculateToolbarBtn.addEventListener("click", async () => {
     let result = await loadDataOnServer(url, data, "POST");
     // Выводим результат расчета в консоль
     console.log(result);
+
     const table = createResultTable(result);
     const objectiveText = document.createElement("p");
     objectiveText.textContent = `Значение функции = ${result.objective}`;
@@ -652,8 +689,35 @@ elements.calculateToolbarBtn.addEventListener("click", async () => {
     elements.resultModalText.appendChild(objectiveText);
     elements.resultModalText.appendChild(table);
     elements.resultModal.showModal();
+
+    //кнопка закрыть на окне резльтаты расчётов
+    elements.resultModalCloseBtn.addEventListener("click", () => {
+      elements.resultModal.close();
+    });
+
+    //кнопка сохранить на окне резльтаты расчётов
+    elements.resultModalSaveBtn.addEventListener("click", () => {
+      downloadFile(result.data, modelName, "dat");
+      downloadFile(result.model, modelName, "mod");
+      downloadFile(result.run, modelName, "run");
+
+      elements.resultModal.close();
+    });
   }
 });
+
+function downloadFile(data, modelName, extension) {
+  var blob = new Blob([data], { type: "application/octet-stream" });
+  var url = URL.createObjectURL(blob);
+
+  var link = document.createElement("a");
+  link.href = url;
+  link.download = `${modelName}.${extension}`;
+
+  link.click();
+
+  setTimeout(() => URL.revokeObjectURL(url), 100);
+}
 
 function createResultTable(result) {
   const statement = result.statement;
@@ -701,6 +765,7 @@ function createResultTable(result) {
 
     return rRow;
   });
+
   rRows.forEach((rRow) => table.appendChild(rRow));
 
   const typeRow = document.createElement("tr");
@@ -737,16 +802,6 @@ function createResultTable(result) {
 
   return table;
 }
-
-//кнопка закрыть на окне резльтаты расчётов
-elements.resultModalCloseBtn.addEventListener("click", () => {
-  elements.resultModal.close();
-});
-
-//кнопка сохранить на окне резльтаты расчётов
-elements.resultModalSaveBtn.addEventListener("click", () => {
-  elements.resultModal.close();
-});
 
 //Элементы
 const elementButtons = [
@@ -1112,7 +1167,6 @@ function initializeGraph(request, properties) {
 // Функция для инициализации пустого графа
 function initializeEmptyGraph(properties) {
   let url = `${hostName}/app/rest/get/style`;
-  console.log();
   // Возвращаем промис, который будет разрешен с объектом графа Cytoscape
   return new Promise((resolve, reject) => {
     // Используем Promise.all для выполнения асинхронного запроса загрузки стилей графа
@@ -1202,15 +1256,6 @@ function createNodeElementConsumerItem(obj) {
 
 //функции для работы приложения
 
-// Функция для установки режимов работы с графиком
-function setModeValue(isAddNodeOn, isAddEdgeOn, isEditModeOn, isDelModeOn) {
-  // Устанавливаем флаги для режимов добавления узла, добавления ребра, редактирования и удаления
-  addNodeOn = isAddNodeOn;
-  addEdgeOn = isAddEdgeOn;
-  editModeOn = isEditModeOn;
-  delModeOn = isDelModeOn;
-}
-
 // Функция для инициализации методов работы с графом в Cytoscape
 function initializeGraphMethods(cy) {
   // Устанавливаем начальный масштаб и позицию камеры
@@ -1218,7 +1263,6 @@ function initializeGraphMethods(cy) {
   // Получаем максимальный идентификатор узла в графе
   nodeId = getMaxNodeId(cy);
   // Устанавливаем начальные значения режимов работы
-  setModeValue(false, false, false, false);
   // Получаем уникальные типы систем в графе и устанавливаем чекбоксы в соответствии с этими типами
   var ids = findSystemTypes(cy);
   setCheckedByIds(ids, elements.hideCheckboxes);
@@ -1313,6 +1357,19 @@ async function handleNodeClick(node) {
         };
       });
     };
+  } else if (nodeType === "connector") {
+    fill = async (systemType) => {};
+    elements.nodeModalList.remove();
+    elements.selectAllNodeModalCheckboxText.remove();
+
+    if (
+      elements.selectAllNodeModalCheckbox &&
+      elements.selectAllNodeModalCheckbox.parentNode
+    ) {
+      elements.selectAllNodeModalCheckbox.parentNode.removeChild(
+        elements.selectAllNodeModalCheckbox
+      );
+    }
   }
 
   await fill(systemType);
@@ -1733,6 +1790,7 @@ function getNonLinearProblem(visibleElements) {
             length: edge.data("length"),
             source: sourceNodeId,
             target: targetNodeId,
+            installed: item.installed,
           };
           edgeCopy += "c";
         });

@@ -19,7 +19,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.function.Supplier;
@@ -92,7 +95,7 @@ public class GetService {
     private <T> Response readJson(String path, Class<T> valueType) {
         ObjectMapper objectMapper = new ObjectMapper();
         T result;
-
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
         try {
             InputStream inputStream = getClass().getClassLoader().getResourceAsStream(path);
             if (inputStream == null) {

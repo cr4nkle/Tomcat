@@ -36,9 +36,6 @@ build/
 
 ### Mac OS ###
 .DS_Store
-/src/main/webapp/node_modules/
-/src/main/webapp/icons/
-/src/main/java/servlet/
-/src/main/java/org/example/
-/src/main/webapp/static/style.json
-/pom_example.txt
+
+
+

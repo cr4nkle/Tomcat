@@ -17,6 +17,13 @@ public class DeleteService {
     public Response deleteModel(@QueryParam("name") String name) {
         PostgresThirdHandler postgresThirdHandler = PostgresThirdHandler.getInstance();
         postgresThirdHandler.deleteModel(name);
-        return Response.ok("{\"message\": \"Удалено\"}").build();
+        if(!name.isEmpty() && name != null){
+            return Response.ok("{\"message\": \"Удалено\"}").build();
+        }else{
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Параметр name не указан или null!!!")
+                    .build();
+        }
+
     }
 }

@@ -3,25 +3,37 @@ package program.logic.statement;
 import program.model.graph.EdgeData;
 import program.model.graph.NodeData;
 import program.model.mathStatement.MathStatement;
+import program.model.mathStatement.NonLinearSolution;
 import program.model.mathStatement.Problem;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class NonLinearStatement {
-    public static MathStatement getNonLinearStatement(Problem problem) {
+
+    public static NonLinearSolution getSolution(Problem problem) {
+        MathStatement mathStatement = getNonLinearStatement(problem);
+        return new NonLinearSolution(
+                convertData(mathStatement),
+                convertModel(mathStatement),
+                convertRun(),
+                mathStatement);
+    }
+
+    private static MathStatement getNonLinearStatement(Problem problem) {
         ArrayList<String> first = problem.getNodeId();
         ArrayList<String> second = problem.getEdgeId();
-        ArrayList<String> firstCopy = new ArrayList<>(first);
         ArrayList<String> secondCopy = new ArrayList<>(second);
         HashMap<String, NodeData> node = problem.getNode();
         HashMap<String, EdgeData> edge = problem.getEdge();
 
         secondCopy.remove(secondCopy.size() - 1);
         secondCopy.remove(secondCopy.size() - 1);
-        firstCopy.remove(firstCopy.size() - 1);
+        first.remove(first.size() - 1);
 
         ArrayList<ArrayList<Double>> matrix = new ArrayList<>();
         ArrayList<Double> lim = new ArrayList<>();
@@ -31,115 +43,82 @@ public class NonLinearStatement {
         ArrayList<Double> goal = new ArrayList<>();
         ArrayList<Boolean> type = new ArrayList<>();
         AtomicInteger count = new AtomicInteger();
-        goal.add(0.0);//добавляем 0, чтобы выровнять нумерацию в решателе
+        goal.add(0.0);// добавляем 0, чтобы выровнять нумерацию в решателе
 
-        CompletableFuture<Void> task1 = CompletableFuture.runAsync(() -> {
-            first.forEach(f -> {
-                ArrayList<Double> row = new ArrayList<>();
-                row.add(0.0);
+        first.forEach(f -> {
+            ArrayList<Double> row = new ArrayList<>();
+            row.add(0.0);
 
-                second.forEach(s -> {
-                    if (node.containsKey(f)) {
-                        double v = 0;
-                        NodeData n = node.get(f);
-                        String nodeType = n.getNodeType();
-                        float h = 1.0f;
+            second.forEach(s -> {
+                if (node.containsKey(f)) {
+                    double v = 0;
+                    NodeData n = node.get(f);
+                    String nodeType = n.getNodeType();
 
-                        //то что с правой части в матрице
-                        switch (s) {
-                            case "sign":
-                                v = (!nodeType.equals("source")) ? 3 : 1;
-                                sign.add((int) v);
-                                break;
-                            case "lim":
-                                if (!nodeType.equals("source")) {
-                                    v = -n.getLoad();
-                                } else if (nodeType.equals("source") && n.isInstalled()) {
-                                    v = n.getMaxGen();
-                                } else {
-                                    v = 0;
-                                }
-                                lim.add(v);
-                                break;
-                            default:
-                                //тело самой матрицы
-                                EdgeData e = edge.get(s);
-                                boolean isSource = f.equals(e.getSource());
-                                boolean isTarget = f.equals(e.getTarget());
+                    // то что с правой части в матрице
+                    switch (s) {
+                        case "sign":
+                            sign.add(!nodeType.equals("source") ? 3 : 1);
+                            break;
+                        case "lim":
+                            if (!nodeType.equals("source")) {
+                                v = -n.getLoad();
+                            } else if (nodeType.equals("source")) {
+                                v = n.getMaxGen();
+                            } else {
+                                v = 0;
+                            }
+                            lim.add(v);
+                            break;
+                        default:
+                            // тело самой матрицы
+                            EdgeData e = edge.get(s);
+                            boolean isSource = f.equals(e.getSource());
+                            boolean isTarget = f.equals(e.getTarget());
 
-                                if (isSource) {
-                                    v = s.endsWith("d") ? -n.getMaxGen() : 1;
-                                } else if (isTarget) {
-                                    if (nodeType.equals("source")) {
-                                        v = s.endsWith("d") ? -n.getMaxGen() : -1;
-                                    } else {
-                                        v = s.endsWith("d") ? 0 : -1;
-                                    }
-                                }
-                                row.add(v);
-                                break;
-                        }
-                    } else {
-                        //для последней строки
-                        switch (s) {
-                            case "sign":
-                                lim.add(1.0);
-                                break;
-                            case "lim":
-                                sign.add(1);
-                                break;
-                            default:
-                                EdgeData e = edge.get(s);
-                                row.add(!e.isInstalled() ? 1.0 : 0.0);
-                                break;
-                        }
+                            if (isSource) {
+                                row.add(1.0);
+                            } else if (isTarget) {
+                                row.add(-1.0);
+                            } else {
+                                row.add(0.0);
+                            }
+                            break;
                     }
-                });
-                matrix.add(row);
-            });
-        });
-
-        CompletableFuture<Void> task2 = CompletableFuture.runAsync(() -> {
-            secondCopy.forEach(s -> {
-                EdgeData e = edge.get(s);
-                min.add(0.0);
-                max.add((double) e.getThroughput());
-
-
-                if (!e.isInstalled()) {
-                    goal.add((double) e.getCost());
-                    type.add(true);
-                    count.getAndIncrement();
-                } else {
-                    goal.add(0.0);
-                    type.add(false);
                 }
             });
+            matrix.add(row);
         });
 
-        task1.join();
-        task2.join();
-        MathStatement mathStatement = new MathStatement(lim, max, min, goal, matrix, sign, type, count.get());
-        String str = convertModel(mathStatement);
-        System.out.println(str);
-        return mathStatement;
+        secondCopy.forEach(s -> {
+            EdgeData e = edge.get(s);
+            min.add(0.0);
+            max.add((double) e.getThroughput());
+
+            if (!e.isInstalled()) {
+                goal.add((double) e.getCost());
+                type.add(true);
+                count.getAndIncrement();
+            } else {
+                goal.add(0.0);
+                type.add(false);
+            }
+        });
+
+        return new MathStatement(lim, max, min, goal, matrix, sign, type, count.get());
     }
 
-    public static String convertModel(MathStatement mathStatement) {
+    private static String convertModel(MathStatement mathStatement) {
         StringBuilder sb = new StringBuilder();
         ArrayList<ArrayList<Double>> matrix = mathStatement.getMatrix();
         ArrayList<Double> lim = mathStatement.getLim();
         ArrayList<Integer> sign = mathStatement.getSign();
-        ArrayList<Double> min = mathStatement.getMin();
-        ArrayList<Double> max = mathStatement.getMax();
-        ArrayList<Double> goal = mathStatement.getGoal();
-        ArrayList<Boolean> type = mathStatement.getType();
         int count = mathStatement.getCount();
 
         int rows = matrix.size();
         int cols = matrix.get(0).size() - 1;
 
-        sb.append(String.format("\nparam cost{i in 1..%d};\n", cols));
+        sb.append(String.format("param cost{i in 1..%d};\n", cols));
         sb.append(String.format("param coef{i in 1..%d, j in 1..%d};\n\n", rows, cols));
 
         sb.append(String.format("var x{i in 1..%d};\n", cols));
@@ -174,16 +153,10 @@ public class NonLinearStatement {
         return sb.toString();
     }
 
-    public static String convertData(MathStatement mathStatement) {
+    private static String convertData(MathStatement mathStatement) {
         StringBuilder sb = new StringBuilder();
         ArrayList<ArrayList<Double>> matrix = mathStatement.getMatrix();
-        ArrayList<Double> lim = mathStatement.getLim();
-        ArrayList<Integer> sign = mathStatement.getSign();
-        ArrayList<Double> min = mathStatement.getMin();
-        ArrayList<Double> max = mathStatement.getMax();
         ArrayList<Double> goal = mathStatement.getGoal();
-        ArrayList<Boolean> type = mathStatement.getType();
-        int count = mathStatement.getCount();
 
         // Заполняем строку для cost
         sb.append("param cost:= ");
@@ -222,7 +195,12 @@ public class NonLinearStatement {
             if (i == matrix.size() - 1)
                 sb.append(";");
         }
+
         return sb.toString();
+    }
+
+    private static String convertRun() {
+        return "solve;\ndisplay x;";
     }
 
 }

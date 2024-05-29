@@ -22,10 +22,8 @@ public class Solution {
     @JsonCreator
     public Solution(
             @JsonProperty("statement") MathStatement mathStatement,
-            @JsonProperty("objective")
-            double objective,
-            @JsonProperty("variables")
-            double[] variables) {
+            @JsonProperty("objective") double objective,
+            @JsonProperty("variables") double[] variables) {
         this.mathStatement = mathStatement;
         this.objective = objective;
         this.variables = variables;

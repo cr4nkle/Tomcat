@@ -1,4 +1,7 @@
 target/
+deploy/images
+build_and_run.bat
+run.bat
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/

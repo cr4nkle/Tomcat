@@ -1,5 +1,5 @@
-const hostName = "http://localhost:8080";
-const localeUrl = `${hostName}/app/rest/get/locale`;
+const hostName = `http://${window.location.hostname}`;
+const localeUrl = `${hostName}/rest/get/locale`;
 let selectedObjectsIds = [];
 let isModelSave = true;
 
@@ -243,7 +243,7 @@ elements.createModelBtn.addEventListener("click", async () => {
 //открыть из бд в тулбаре
 elements.openChooseModelModalToolbarBtn.addEventListener("click", async () => {
   elements.chooseModelModal.showModal(); //показываем окно с выбором названий
-  let url = `${hostName}/app/rest/get/models`;
+  let url = `${hostName}/rest/get/models`;
   let selectedModel = null;
   const response = await loadDataFromServer(url);
   const modelList = response.name;
@@ -292,7 +292,7 @@ elements.openChooseModelModalToolbarBtn.addEventListener("click", async () => {
           showMessage("Ввод отменен");
         }
         // Создаем URL для запроса к серверу с именем модели
-        let url = `${hostName}/app/rest/get/model?name=${modelName}`;
+        let url = `${hostName}/rest/get/model?name=${modelName}`;
         // Инициализируем граф с данными из сервера
 
         cy = await initializeGraph(new Request(url), cyProperties);
@@ -310,7 +310,7 @@ elements.openChooseModelModalToolbarBtn.addEventListener("click", async () => {
 //нажатие на кнопку открыть из бд со стартового окна
 elements.openChooseModelModalBtn.addEventListener("click", async () => {
   elements.startModal.close();
-  let url = `${hostName}/app/rest/get/models`;
+  let url = `${hostName}/rest/get/models`;
   let selectedModel = null;
   const response = await loadDataFromServer(url);
   const modelList = response.name;
@@ -357,7 +357,7 @@ elements.openChooseModelModalBtn.addEventListener("click", async () => {
           showMessage("Ввод отменен");
         }
         // Создаем URL для запроса к серверу с именем модели
-        let url = `${hostName}/app/rest/get/model?name=${modelName}`;
+        let url = `${hostName}/rest/get/model?name=${modelName}`;
         // Инициализируем граф с данными из сервера
 
         cy = await initializeGraph(new Request(url), cyProperties);
@@ -430,7 +430,7 @@ elements.saveToDeviceToolbarBtn.addEventListener("click", () => {
 //соханяем в базу данных
 elements.saveToDataWarehouseToolbarBtn.addEventListener("click", async () => {
   if (cy !== null) {
-    let url = `${hostName}/app/rest/post/save`;
+    let url = `${hostName}/rest/post/save`;
     // Получаем JSON представление графа
     let graphJSON = cy.json();
     // Получаем идентификаторы всех ребер
@@ -460,7 +460,7 @@ elements.saveToDataWarehouseToolbarBtn.addEventListener("click", async () => {
 //удаление модели
 elements.deleteModelToolbarBtn.addEventListener("click", () => {
   // Создаем URL для запроса к серверу на удаление модели
-  let deleteUrl = `${hostName}/app/rest/delete/model?name=${modelName}`;
+  let deleteUrl = `${hostName}/rest/delete/model?name=${modelName}`;
   // Вызываем функцию для удаления данных с сервера
   deleteDataFromServer(deleteUrl);
   showMessage(`Модель ${modelName} удалена.`);
@@ -660,6 +660,7 @@ elements.bullseyeToolbarBtn.addEventListener("click", () => {
 });
 
 //Операция расчет
+let result;
 
 elements.calculateToolbarBtn.addEventListener("click", async () => {
   // Проверяем, что граф инициализирован
@@ -669,7 +670,7 @@ elements.calculateToolbarBtn.addEventListener("click", async () => {
       return element.style("display") !== "none";
     });
 
-    const url = `${hostName}/app/rest/post/calculate?type=nonlinear`;
+    const url = `${hostName}/rest/post/calculate?type=nonlinear`;
     // Получаем данные проблемы для расчета
     // let problem = getLinearProblem(visibleElements);
     let problem = getNonLinearProblem(visibleElements);
@@ -677,7 +678,7 @@ elements.calculateToolbarBtn.addEventListener("click", async () => {
     // Преобразуем данные проблемы в JSON строку
     let data = JSON.stringify(problem);
     // Отправляем данные на сервер для расчета
-    let result = await loadDataOnServer(url, data, "POST");
+    result = await loadDataOnServer(url, data, "POST");
     // Выводим результат расчета в консоль
     console.log(result);
 
@@ -689,23 +690,22 @@ elements.calculateToolbarBtn.addEventListener("click", async () => {
     elements.resultModalText.appendChild(objectiveText);
     elements.resultModalText.appendChild(table);
     elements.resultModal.showModal();
-
-    //кнопка закрыть на окне резльтаты расчётов
-    elements.resultModalCloseBtn.addEventListener("click", () => {
-      elements.resultModal.close();
-    });
-
-    //кнопка сохранить на окне резльтаты расчётов
-    elements.resultModalSaveBtn.addEventListener("click", () => {
-      downloadFile(result.data, modelName, "dat");
-      downloadFile(result.model, modelName, "mod");
-      downloadFile(result.run, modelName, "run");
-
-      elements.resultModal.close();
-    });
   }
 });
 
+elements.resultModalCloseBtn.addEventListener("click", () => {
+  elements.resultModal.close();
+});
+
+elements.resultModalSaveBtn.addEventListener("click", () => {
+  downloadFile(result.data, modelName, "dat");
+  downloadFile(result.model, modelName, "mod");
+  downloadFile(result.run, modelName, "run");
+
+  elements.resultModal.close();
+});
+
+//кнопка сохранить на окне резльтаты расчётов
 function downloadFile(data, modelName, extension) {
   var blob = new Blob([data], { type: "application/octet-stream" });
   var url = URL.createObjectURL(blob);
@@ -713,10 +713,25 @@ function downloadFile(data, modelName, extension) {
   var link = document.createElement("a");
   link.href = url;
   link.download = `${modelName}.${extension}`;
+  link.style.display = "none"; // Скрываем элемент <a>, чтобы он не отображался на странице
 
-  link.click();
+  document.body.appendChild(link); // Добавляем элемент <a> в документ
+  link.click(); // Запускаем скачивание файла
 
-  setTimeout(() => URL.revokeObjectURL(url), 100);
+  setTimeout(() => {
+    document.body.removeChild(link); // Удаляем элемент <a> после скачивания файла
+    URL.revokeObjectURL(url); // Освобождаем память
+  }, 100);
+
+  // downloadLinks.push(link); // Добавляем ссылку на элемент <a> в массив
+}
+
+// Функция для очистки массива downloadLinks, если необходимо
+function clearDownloadLinks() {
+  downloadLinks.forEach((link) => {
+    document.body.removeChild(link);
+  });
+  downloadLinks = []; // Очищаем массив
 }
 
 function createResultTable(result) {
@@ -1132,7 +1147,7 @@ function getMaxNodeId(cy) {
 
 // Функция для инициализации графа с данными, полученными из запроса
 function initializeGraph(request, properties) {
-  let url = `${hostName}/app/rest/get/style`;
+  let url = `${hostName}/rest/get/style`;
   // Возвращаем промис, который будет разрешен с объектом графа Cytoscape
   return new Promise((resolve, reject) => {
     // Используем Promise.all для параллельного выполнения двух асинхронных запросов
@@ -1166,7 +1181,7 @@ function initializeGraph(request, properties) {
 
 // Функция для инициализации пустого графа
 function initializeEmptyGraph(properties) {
-  let url = `${hostName}/app/rest/get/style`;
+  let url = `${hostName}/rest/get/style`;
   // Возвращаем промис, который будет разрешен с объектом графа Cytoscape
   return new Promise((resolve, reject) => {
     // Используем Promise.all для выполнения асинхронного запроса загрузки стилей графа
@@ -1319,8 +1334,13 @@ async function handleNodeClick(node) {
 
   if (nodeType === "source") {
     fill = async (systemType) => {
-      let url = `${hostName}/app/rest/get/sources?type=${systemType}`;
+      let url = `${hostName}/rest/get/sources?type=${systemType}`;
       const data = await loadDataFromServer(url);
+
+      // Показать элементы
+      elements.nodeModalList.style.display = "";
+      elements.selectAllNodeModalCheckboxText.style.display = "";
+      elements.selectAllNodeModalCheckbox.style.display = "";
 
       elements.nodeModalList.innerHTML = "";
 
@@ -1341,8 +1361,13 @@ async function handleNodeClick(node) {
     };
   } else if (nodeType === "consumer") {
     fill = async (systemType) => {
-      let url = `${hostName}/app/rest/get/consumers?type=${systemType}`;
+      let url = `${hostName}/rest/get/consumers?type=${systemType}`;
       const data = await loadDataFromServer(url);
+
+      // Показать элементы
+      elements.nodeModalList.style.display = "";
+      elements.selectAllNodeModalCheckboxText.style.display = "";
+      elements.selectAllNodeModalCheckbox.style.display = "";
 
       elements.nodeModalList.innerHTML = "";
 
@@ -1359,16 +1384,14 @@ async function handleNodeClick(node) {
     };
   } else if (nodeType === "connector") {
     fill = async (systemType) => {};
-    elements.nodeModalList.remove();
-    elements.selectAllNodeModalCheckboxText.remove();
+    elements.nodeModalList.style.display = "none";
+    elements.selectAllNodeModalCheckboxText.style.display = "none";
 
     if (
       elements.selectAllNodeModalCheckbox &&
       elements.selectAllNodeModalCheckbox.parentNode
     ) {
-      elements.selectAllNodeModalCheckbox.parentNode.removeChild(
-        elements.selectAllNodeModalCheckbox
-      );
+      elements.selectAllNodeModalCheckbox.style.display = "none";
     }
   }
 
@@ -1449,7 +1472,7 @@ async function handleEdgeClick(edge) {
   console.log(isLocked);
 
   const fill = async (systemType) => {
-    let url = `${hostName}/app/rest/get/lines?type=${systemType}`;
+    let url = `${hostName}/rest/get/lines?type=${systemType}`;
     const data = await loadDataFromServer(url);
 
     elements.nodeModalList.innerHTML = "";

@@ -12,7 +12,7 @@ services:
     container_name: tomcat
     image: tomcat-lpsolve:latest
     volumes:
-      - ./target/app.war:/usr/local/tomcat/webapps/app.war
+      - ./war/app:/usr/local/tomcat/webapps/app
     links:
       - modelStorage
       - metaInfo
@@ -29,7 +29,7 @@ services:
       POSTGRES_PASSWORD: root
       POSTGRES_PORT: 5432
     volumes:
-      - ./dump/modelStorage.sql:/docker-entrypoint-initdb.d/modelStorage.sql
+      - ./backup/modelStorage.sql:/docker-entrypoint-initdb.d/modelStorage.sql
 
   metaInfo:
     container_name: metaInfo
@@ -41,9 +41,9 @@ services:
       POSTGRES_PASSWORD: root
       POSTGRES_PORT: 5432
     volumes:
-      - ./dump/metaInfo.sql:/docker-entrypoint-initdb.d/metaInfo.sql
+      - ./backup/metaInfo.sql:/docker-entrypoint-initdb.d/metaInfo.sql
 
 volumes:
-  target-war:
-  dump-modelStorage:
-  dump-metaInfo:
+  deploy-war:
+  backup-modelStorage:
+  backup-metaInfo:

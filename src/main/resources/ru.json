@@ -10,11 +10,13 @@
   "newModelModal": {
     "title": "Введите название модели",
     "placeholder": "Название модели",
-    "createModel": "Создать модель"
+    "createModel": "Создать модель",
+    "close": "Закрыть"
   },
   "chooseModelModal": {
     "title": "Недавние модели",
-    "button": "Открыть модель"
+    "button": "Открыть модель",
+    "close": "Закрыть"
   },
   "messageModal": {
     "title": "Сообщение",
@@ -28,22 +30,23 @@
       "water": "Водоснабжение",
       "fuel": "Топливоснабжение",
       "block": "Заблокировать",
-      "all": "Выбрать всё"
+      "all": "Выбрать всё",
+      "grouped": "В группе"
     },
-    "inf": {
-      "name": "Наименование",
-      "capCosts": "Кап. затраты",
-      "price": "Цена",
-      "genMax": "Генарация (max)",
-      "genMin": "Генарация (min)"
-    },
+    "elementPlaceholder": "Название элемента",
+    "groupPlaceholder": "Название группы",
     "save": "Сохранить",
     "close": "Закрыть"
   },
   "resultModal": {
     "title": "Результаты расчетов",
     "save": "Сохранить",
-    "close": "Закрыть"
+    "close": "Закрыть",
+    "calculate": "Рассчитать",
+    "checkboxes": {
+      "linear": "Линейная",
+      "nonlinear": "Нелинейная"
+    }
   },
   "toolbarButtons": {
     "openNewModelModalToolbarBtn": "Создать новую модель",

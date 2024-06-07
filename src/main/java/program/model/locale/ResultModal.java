@@ -9,6 +9,8 @@ public class ResultModal {
     private String title;
     private String save;
     private String close;
+    private String calculate;
+    private ResultCheckboxes checkboxes;
 
     public ResultModal() {
     }
@@ -16,11 +18,14 @@ public class ResultModal {
     public ResultModal(
             String title,
             String save,
-            String close
-    ) {
+            String close,
+            String calculate,
+            ResultCheckboxes checkboxes) {
         this.title = title;
         this.save = save;
         this.close = close;
+        this.calculate = calculate;
+        this.checkboxes = checkboxes;
     }
 
     public String getTitle() {
@@ -45,5 +50,21 @@ public class ResultModal {
 
     public void setClose(String close) {
         this.close = close;
+    }
+
+    public void steCalculate(String calculate) {
+        this.calculate = calculate;
+    }
+
+    public String getCalculate() {
+        return calculate;
+    }
+
+    public void setCheckboxes(ResultCheckboxes checkboxes) {
+        this.checkboxes = checkboxes;
+    }
+
+    public ResultCheckboxes getCheckboxes() {
+        return checkboxes;
     }
 }

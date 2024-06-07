@@ -12,6 +12,7 @@ public class Checkboxes {
     private String fuel;
     private String block;
     private String all;
+    private String grouped;
 
     public Checkboxes() {
     }
@@ -22,14 +23,15 @@ public class Checkboxes {
             String water,
             String fuel,
             String block,
-            String all
-    ) {
+            String all,
+            String grouped) {
         this.heat = heat;
         this.power = power;
         this.water = water;
         this.fuel = fuel;
         this.block = block;
         this.all = all;
+        this.grouped = grouped;
     }
 
     public String getHeat() {
@@ -78,5 +80,13 @@ public class Checkboxes {
 
     public void setAll(String all) {
         this.all = all;
+    }
+
+    public void setGrouped(String grouped) {
+        this.grouped = grouped;
+    }
+
+    public String getGrouped() {
+        return grouped;
     }
 }

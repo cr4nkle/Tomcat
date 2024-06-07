@@ -14,11 +14,6 @@ body {
   position: relative;
 }
 
-.header {
-  position: relative;
-  z-index: 1;
-}
-
 #cy {
   position: absolute;
   top: 0;
@@ -60,11 +55,16 @@ input {
   flex-direction: column;
   gap: 5px;
 }
+.list-row {
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
+  justify-content: center;
+}
 
 .modal_choose_model_list {
   max-height: 200px;
   overflow-y: scroll;
-  /* padding: 15px 0px; */
   border: 1px solid rgb(202, 202, 202);
   border-radius: 5px;
 }
@@ -96,6 +96,7 @@ input {
 
 .modal_node_blocks {
   display: flex;
+  justify-content: center;
   gap: 25px;
 }
 
@@ -113,6 +114,11 @@ input {
   justify-content: center;
   gap: 5px;
 }
+.modal_btns {
+  display: flex;
+  justify-content: space-between;
+  gap: 5px;
+}
 
 .modal_node_block {
   padding: 10px;
@@ -124,7 +130,7 @@ input {
 
 .modal_node_block_inf {
   overflow-y: scroll;
-  max-height: 167px;
+  max-height: 278px;
   width: 350px;
 }
 
@@ -139,6 +145,7 @@ input {
   border-radius: 10px;
   transition: all 250ms ease;
   cursor: pointer;
+  min-height: 42px;
 }
 
 .btn.btn-primary {
@@ -240,16 +247,24 @@ input {
 .header {
   background-color: rgb(243, 243, 243);
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.322);
+  position: relative;
+  z-index: 1;
 }
 
 .modal {
   background: rgb(255, 255, 255);
   padding: 15px 25px;
-  min-width: 350px;
-  min-height: 100px;
   margin: auto;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.16);
   border-radius: 5px;
+}
+.start {
+  min-width: 320px;
+  min-height: 175px;
+}
+.choose {
+  min-width: 300px;
+  min-height: 270;
 }
 
 .modal_content {
@@ -277,6 +292,7 @@ input {
   align-items: center;
   padding: 10px;
   width: 100vw;
+  justify-content: center;
 }
 
 .toolbar_list {
@@ -301,4 +317,18 @@ input {
 }
 .toolbar_item img {
   width: 20px;
+}
+.scrollable-area {
+  width: 100%;
+  min-height: 200px;
+  max-height: 500px;
+  min-width: 312px;
+  max-width: 812px;
+  overflow-y: auto;
+  overflow-x: auto;
+  border: 1px solid #ccc;
+  border-radius: 7px;
+}
+.line {
+  border-top: 1px solid rgb(224, 224, 224);
 }

@@ -1,9 +1,10 @@
 {
   "style": [
     {
-      "selector": "edge:selected",
+      "selector": "node",
       "style": {
-        "line-style": "dashed"
+        "label": "data(name)",
+        "font-size": "10px"
       }
     },
     {
@@ -16,6 +17,12 @@
         "curve-style": "bezier",
         "arrow-scale": 0.8,
         "target-arrow-shape": "triangle"
+      }
+    },
+    {
+      "selector": "edge:selected",
+      "style": {
+        "line-style": "dashed"
       }
     },
     {
@@ -37,6 +44,12 @@
       }
     },
     {
+      "selector": "edge[grouped = \"true\"]",
+      "style": {
+        "label": "data(group_name)"
+      }
+    },
+    {
       "selector": "node:locked",
       "style": {
         "border-width": "6px",
@@ -46,36 +59,16 @@
       }
     },
     {
-      "selector": "node",
-      "style": {
-        "label": "data(name)",
-        "font-size": "10px"
-      }
-    },
-
-    {
       "selector": "node[node_type = \"source\"]",
-      "style": {
-        "shape": "triangle",
-        "height": "40px",
-        "width": "40px"
-      }
+      "style": { "shape": "triangle", "height": "40px", "width": "40px" }
     },
     {
       "selector": "node[node_type = \"connector\"]",
-      "style": {
-        "shape": "rectangle",
-        "height": "20px",
-        "width": "20px"
-      }
+      "style": { "shape": "rectangle", "height": "20px", "width": "20px" }
     },
     {
       "selector": "node[node_type = \"consumer\"]",
-      "style": {
-        "shape": "ellipse",
-        "height": "30px",
-        "width": "30px"
-      }
+      "style": { "shape": "ellipse", "height": "30px", "width": "30px" }
     },
     {
       "selector": "node[system_type = \"heat\"]",

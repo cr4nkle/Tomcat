@@ -4,13 +4,14 @@ services:
   nginx:
     container_name: nginx
     image: nginx-tomcat-proxy:latest
-    restart: always
+    restart: on-failure
     ports:
       - "80:80"
 
   tomcat:
     container_name: tomcat
     image: tomcat-lpsolve:latest
+    restart: on-failure
     volumes:
       - ./target/app.war:/usr/local/tomcat/webapps/app.war
     links:
@@ -22,7 +23,7 @@ services:
   modelStorage:
     container_name: modelStorage
     image: postgres:11
-    restart: always
+    restart: on-failure
     environment:
       POSTGRES_DB: modelStorage
       POSTGRES_USER: postgres
@@ -34,7 +35,7 @@ services:
   metaInfo:
     container_name: metaInfo
     image: postgres:11
-    restart: always
+    restart: on-failure
     environment:
       POSTGRES_DB: metaInfo
       POSTGRES_USER: postgres
@@ -42,8 +43,3 @@ services:
       POSTGRES_PORT: 5432
     volumes:
       - ./dump/metaInfo.sql:/docker-entrypoint-initdb.d/metaInfo.sql
-
-volumes:
-  target-war:
-  dump-modelStorage:
-  dump-metaInfo:

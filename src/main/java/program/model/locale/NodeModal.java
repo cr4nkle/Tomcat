@@ -8,9 +8,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public class NodeModal {
     private String title;
     private Checkboxes checkboxes;
-    private Inf inf;
     private String save;
     private String close;
+    private String elementPlaceholder;
+    private String groupPlaceholder;
 
     public NodeModal() {
     }
@@ -18,15 +19,16 @@ public class NodeModal {
     public NodeModal(
             String title,
             Checkboxes checkboxes,
-            Inf inf,
             String save,
-            String close
-    ) {
+            String close,
+            String elementPlaceholder,
+            String groupPlaceholder) {
         this.title = title;
         this.checkboxes = checkboxes;
-        this.inf = inf;
         this.save = save;
         this.close = close;
+        this.elementPlaceholder = elementPlaceholder;
+        this.groupPlaceholder = groupPlaceholder;
     }
 
     public String getTitle() {
@@ -35,10 +37,6 @@ public class NodeModal {
 
     public Checkboxes getCheckboxes() {
         return checkboxes;
-    }
-
-    public Inf getInf() {
-        return inf;
     }
 
     public String getSave() {
@@ -57,15 +55,27 @@ public class NodeModal {
         this.checkboxes = checkboxes;
     }
 
-    public void setInf(Inf inf) {
-        this.inf = inf;
-    }
-
     public void setSave(String save) {
         this.save = save;
     }
 
     public void setClose(String close) {
         this.close = close;
+    }
+
+    public void setElementPlaceholder(String elementPlaceholder) {
+        this.elementPlaceholder = elementPlaceholder;
+    }
+
+    public void setGroupPlaceholder(String groupPlaceholder) {
+        this.groupPlaceholder = groupPlaceholder;
+    }
+
+    public String getElementPlaceholder() {
+        return elementPlaceholder;
+    }
+
+    public String getgroupPlaceholder() {
+        return groupPlaceholder;
     }
 }

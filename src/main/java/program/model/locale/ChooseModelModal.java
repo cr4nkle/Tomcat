@@ -8,16 +8,18 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public class ChooseModelModal {
     private String title;
     private String button;
+    private String close;
 
     public ChooseModelModal() {
     }
 
     public ChooseModelModal(
             String title,
-            String button
-    ) {
+            String button,
+            String close) {
         this.title = title;
         this.button = button;
+        this.close = close;
     }
 
     public void setTitle(String title) {
@@ -34,5 +36,13 @@ public class ChooseModelModal {
 
     public void setButton(String button) {
         this.button = button;
+    }
+
+    public void setClose(String close) {
+        this.close = close;
+    }
+
+    public String getClose() {
+        return close;
     }
 }

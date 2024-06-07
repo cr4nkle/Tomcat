@@ -9,6 +9,7 @@ public class NewModelModal {
     private String title;
     private String placeholder;
     private String createModel;
+    private String close;
 
     public NewModelModal() {
     }
@@ -16,11 +17,12 @@ public class NewModelModal {
     public NewModelModal(
             String title,
             String placeholder,
-            String createModel
-    ) {
+            String createModel,
+            String close) {
         this.title = title;
         this.placeholder = placeholder;
         this.createModel = createModel;
+        this.close = close;
     }
 
     public String getTitle() {
@@ -45,5 +47,13 @@ public class NewModelModal {
 
     public void setCreateModel(String createModel) {
         this.createModel = createModel;
+    }
+
+    public void setClose(String close) {
+        this.close = close;
+    }
+
+    public String getClose() {
+        return close;
     }
 }

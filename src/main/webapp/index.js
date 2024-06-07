@@ -8,8 +8,6 @@ const getElement = (id) => document.getElementById(id);
 
 // Объект для хранения элементов
 const elements = {
-  // startModalTitle: getElement("startModalTitle"),
-  newModelBtn: getElement("newModelBtn"),
   newModelModalTitle: getElement("newModelModalTitle"),
   newModelNameInput: getElement("newModelNameInput"),
   createModelBtn: getElement("createModelBtn"),
@@ -21,12 +19,13 @@ const elements = {
   newModelModal: getElement("newModelModal"),
   newModelBtn: getElement("newModelBtn"),
   createModelBtn: getElement("createModelBtn"),
-  newModelNameInput: getElement("newModelNameInput"),
+  newModelModalCloseBtn: getElement("newModelModalCloseBtn"),
 
   chooseModelModal: getElement("chooseModelModal"),
   resultModal: getElement("resultModal"),
   openChooseModelModalBtn: getElement("openChooseModelModal"),
   openModelBtn: getElement("openModelButton"),
+  chooseModelModalCloseBtn: getElement("chooseModelModalCloseBtn"),
 
   modelList: getElement("modelList"),
 
@@ -61,22 +60,24 @@ const elements = {
   nodeModalCheckboxes: Array.from(
     document.querySelectorAll(".modal_node_block_checkboxes label")
   ),
-  nodeModalInf: Array.from(
-    document.querySelectorAll(".modal_node_block_inf label")
-  ),
   nodeModalSaveBtn: getElement("nodeModalSaveBtn"),
   nodeModalCloseBtn: getElement("nodeModalCloseBtn"),
   selectAllNodeModalCheckbox: getElement("selectAllNodeModalCheckbox"),
   blockNodeModalCheckbox: getElement("blockNodeModalCheckbox"),
   nodeModalList: getElement("nodeModalList"),
-  lineBtn: getElement("lineBtn"),
+  groupNameInput: getElement("groupNameInput"),
+  elementNameInput: getElement("elementNameInput"),
+  lineBtn: getElement("lineBtn"), //возможно удалить
   sourceBtn: getElement("sourceBtn"),
   consumerBtn: getElement("consumerBtn"),
 
   resultModalTitle: getElement("resultModalTitle"),
   resultModalSaveBtn: getElement("resultModalSaveBtn"),
   resultModalCloseBtn: getElement("resultModalCloseBtn"),
+  resultModalCalculateBtn: getElement("resultModalCalculateBtn"),
   resultModalText: getElement("resultModalText"),
+  linearCheckboxText: getElement("linearCheckboxText"),
+  nonlinearCheckboxText: getElement("nonlinearCheckboxText"),
 
   waterNodeModalCheckboxText: getElement("waterNodeModalCheckboxText"),
   powerNodeModalCheckboxText: getElement("powerNodeModalCheckboxText"),
@@ -84,6 +85,9 @@ const elements = {
   heatNodeModalCheckboxText: getElement("heatNodeModalCheckboxText"),
   blockNodeModalCheckboxText: getElement("blockNodeModalCheckboxText"),
   selectAllNodeModalCheckboxText: getElement("selectAllNodeModalCheckboxText"),
+  addToGroupNodeModalCheckboxText: getElement(
+    "addToGroupNodeModalCheckboxText"
+  ),
   cytoscapeContainer: getElement("cy"),
   hideCheckboxes: document.querySelectorAll(
     ".toolbar_list input[type=checkbox]"
@@ -93,6 +97,8 @@ const elements = {
   powerNodeModalCheckbox: getElement("powerNodeModalCheckbox"),
   fuelNodeModalCheckbox: getElement("fuelNodeModalCheckbox"),
   heatNodeModalCheckbox: getElement("heatNodeModalCheckbox"),
+  addToGroupNodeModalCheckbox: getElement("addToGroupNodeModalCheckbox"),
+  scrollableArea: document.querySelector(".scrollable-area"),
 };
 
 loadDataFromServer(localeUrl)
@@ -121,15 +127,16 @@ loadDataFromServer(localeUrl)
     elements.openChooseModelModalBtn.textContent =
       data.startModal.buttons.openDataStorage;
     elements.openFromDeviceBtn.textContent = data.startModal.buttons.openDevice;
-    // elements.startModalTitle.textContent = data.startModal.title;
     elements.newModelBtn.textContent = data.startModal.buttons.newModel;
 
     elements.newModelModalTitle.textContent = data.newModelModal.title;
     elements.newModelNameInput.placeholder = data.newModelModal.placeholder;
     elements.createModelBtn.textContent = data.newModelModal.createModel;
+    elements.newModelModalCloseBtn.textContent = data.newModelModal.close;
 
     elements.chooseModelModalTitle.textContent = data.chooseModelModal.title;
     elements.openModelButton.textContent = data.chooseModelModal.button;
+    elements.chooseModelModalCloseBtn.textContent = data.chooseModelModal.close;
 
     elements.messageModalTitle.textContent = data.messageModal.title;
     elements.messageModalCloseBtn.textContent = data.messageModal.close;
@@ -138,15 +145,15 @@ loadDataFromServer(localeUrl)
     elements.nodeModalCheckboxes.forEach((checkbox, index) => {
       checkbox.textContent = Object.values(data.nodeModal.checkboxes)[index];
     });
-    elements.nodeModalInf.forEach((label, index) => {
-      label.textContent = Object.values(data.nodeModal.inf)[index];
-    });
     elements.nodeModalSaveBtn.textContent = data.nodeModal.save;
     elements.nodeModalCloseBtn.textContent = data.nodeModal.close;
+    elements.elementNameInput.placeholder = data.nodeModal.elementPlaceholder;
+    elements.groupNameInput.placeholder = data.nodeModal.groupPlaceholder;
 
     elements.resultModalTitle.textContent = data.resultModal.title;
     elements.resultModalSaveBtn.textContent = data.resultModal.save;
     elements.resultModalCloseBtn.textContent = data.resultModal.close;
+    elements.resultModalCalculateBtn.textContent = data.resultModal.calculate;
 
     elements.waterNodeModalCheckboxText.textContent =
       data.nodeModal.checkboxes.water;
@@ -160,6 +167,12 @@ loadDataFromServer(localeUrl)
       data.nodeModal.checkboxes.block;
     elements.selectAllNodeModalCheckboxText.textContent =
       data.nodeModal.checkboxes.all;
+    elements.addToGroupNodeModalCheckboxText.textContent =
+      data.nodeModal.checkboxes.grouped;
+    elements.linearCheckboxText.textContent =
+      data.resultModal.checkboxes.linear;
+    elements.nonlinearCheckboxText.textContent =
+      data.resultModal.checkboxes.nonlinear;
   })
   .catch((error) => console.error("Ошибка загрузки перевода:", error));
 
@@ -238,6 +251,10 @@ elements.createModelBtn.addEventListener("click", async () => {
   } else {
     showMessage("Вы не сохранили модель!!");
   }
+});
+
+elements.newModelModalCloseBtn.addEventListener("click", () => {
+  elements.newModelModal.close();
 });
 
 //открыть из бд в тулбаре
@@ -370,6 +387,10 @@ elements.openChooseModelModalBtn.addEventListener("click", async () => {
       showMessage("Вы не сохранили модель!!");
     }
   });
+});
+
+elements.chooseModelModalCloseBtn.addEventListener("click", () => {
+  elements.chooseModelModal.close();
 });
 
 //открытие модели с компьютера
@@ -552,6 +573,7 @@ function toggleMoveBtn(buttons) {
     elements.moveToolbarBtn.classList.remove("selected");
   }
 }
+
 function toggleMode(modeFlag, enable) {
   if (modeFlag === "addNode") {
     addNodeOn = enable;
@@ -663,6 +685,22 @@ elements.bullseyeToolbarBtn.addEventListener("click", () => {
 let result;
 
 elements.calculateToolbarBtn.addEventListener("click", async () => {
+  elements.resultModal.showModal();
+});
+
+elements.resultModalCloseBtn.addEventListener("click", () => {
+  elements.resultModal.close();
+});
+
+elements.resultModalSaveBtn.addEventListener("click", () => {
+  downloadFile(result.data, modelName, "dat");
+  downloadFile(result.model, modelName, "mod");
+  downloadFile(result.run, modelName, "run");
+
+  elements.resultModal.close();
+});
+
+elements.resultModalCalculateBtn.addEventListener("click", async () => {
   // Проверяем, что граф инициализирован
   if (cy !== null) {
     // Получаем все видимые элементы графа (узлы и ребра)
@@ -683,26 +721,14 @@ elements.calculateToolbarBtn.addEventListener("click", async () => {
     console.log(result);
 
     const table = createResultTable(result);
+
     const objectiveText = document.createElement("p");
     objectiveText.textContent = `Значение функции = ${result.objective}`;
 
-    elements.resultModalText.innerHTML = "";
-    elements.resultModalText.appendChild(objectiveText);
-    elements.resultModalText.appendChild(table);
-    elements.resultModal.showModal();
+    // elements.resultModalText.innerHTML = "";
+    // elements.resultModalText.appendChild(objectiveText);
+    elements.scrollableArea.appendChild(table);
   }
-});
-
-elements.resultModalCloseBtn.addEventListener("click", () => {
-  elements.resultModal.close();
-});
-
-elements.resultModalSaveBtn.addEventListener("click", () => {
-  downloadFile(result.data, modelName, "dat");
-  downloadFile(result.model, modelName, "mod");
-  downloadFile(result.run, modelName, "run");
-
-  elements.resultModal.close();
 });
 
 //кнопка сохранить на окне резльтаты расчётов
@@ -722,8 +748,6 @@ function downloadFile(data, modelName, extension) {
     document.body.removeChild(link); // Удаляем элемент <a> после скачивания файла
     URL.revokeObjectURL(url); // Освобождаем память
   }, 100);
-
-  // downloadLinks.push(link); // Добавляем ссылку на элемент <a> в массив
 }
 
 // Функция для очистки массива downloadLinks, если необходимо
@@ -871,14 +895,32 @@ elements.nodeModalCloseBtn.addEventListener("click", () => {
 //кнопка закрыть на окне информация об оборудовании
 elements.nodeModalSaveBtn.addEventListener("click", () => {
   let systemType = getSystemTypeFromCheckboxes();
-  console.log(systemType);
 
   //Проверяем, что граф инициализирован
   if (cy !== null) {
     // Проверяем, что выбран узел или ребро
     if (selectedNode !== null) {
+      let checked = elements.addToGroupNodeModalCheckbox.checked;
+      if (elements.elementNameInput.value.trim() !== "")
+        selectedNode.data("name", elements.elementNameInput.value);
+
+      if (checked) {
+        selectedNode.data("name", elements.elementNameInput.value);
+        selectedNode.data("grouped", "true");
+        //проверка на пустое поле
+        if (elements.groupNameInput.value.trim() !== "") {
+          selectedNode.data("group_name", elements.groupNameInput.value);
+        } else {
+          showMessage("Вы не вввели наименование!!");
+          return;
+        }
+      } else {
+        selectedNode.data("grouped", "false");
+        selectedNode.data("group_name", "");
+      }
+
       // Получаем тип выбранного узла
-      var type = selectedNode.data("node_type");
+      let type = selectedNode.data("node_type");
 
       // Обработка для узла-источника
       if (type === "source") {
@@ -900,17 +942,20 @@ elements.nodeModalSaveBtn.addEventListener("click", () => {
     else if (selectedEdge !== null) {
       saveSelectedData(selectedEdge, linesData);
       selectedEdge.data("system_type", systemType);
+      selectedEdge.data("name", elements.elementNameInput.value);
       selectedEdge.locked(elements.blockNodeModalCheckbox.checked);
-      console.log(elements.blockNodeModalCheckbox.checked);
     }
   }
 
-  var ids = findSystemTypes(cy);
-  setCheckedByIds(ids, elements.hideCheckboxes);
+  // var ids = findSystemTypes(cy);
+  // setCheckedByIds(ids, elements.hideCheckboxes);
 
   elements.nodeModal.close();
   elements.selectAllNodeModalCheckbox.checked = false;
   elements.blockNodeModalCheckbox.checked = false;
+  elements.elementNameInput.value = "";
+  elements.groupNameInput.value = "";
+  elements.addToGroupNodeModalCheckbox.checked = false;
 });
 
 function getSystemTypeFromCheckboxes() {
@@ -1233,7 +1278,7 @@ function createNodeElementLineItem(obj) {
     <p>Сопротивление: ${obj.resistance}</p>
     <p>Цена: ${obj.cost}</p>
     <label><input type="checkbox" value="${obj.id}" /> Выбрать</label>
-    
+    <label><input type="checkbox" value="${obj.id}" /> Установлено</label>    
   `;
 
   return element;
@@ -1250,6 +1295,7 @@ function createNodeElementSourceItem(obj) {
     <p>Затраты: ${obj.cost}</p>
     <p>Эффективность: ${obj.efficiency}</p>
     <label><input type="checkbox" value="${obj.id}" /> Выбрать</label>
+    <label><input type="checkbox" value="${obj.id}" /> Установлено</label>  
   `;
 
   return element;
@@ -1262,6 +1308,7 @@ function createNodeElementConsumerItem(obj) {
     <p>Наименование: ${obj.name}</p>
     <p>Нагрузка: ${obj.load}</p>
     <label><input type="checkbox" value="${obj.id}" /> Выбрать</label>
+    <label><input type="checkbox" value="${obj.id}" /> Установлено</label>  
   `;
 
   return element;
@@ -1326,14 +1373,21 @@ function initializeGraphMethods(cy) {
 
 // Функция для обработки клика по узлу
 async function handleNodeClick(node) {
-  let equipment = node.data("equipment");
+  // let equipment = node.data("equipment");
   let systemType = node.data("system_type");
   let nodeType = node.data("node_type");
   let isLocked = node.locked();
   let fill;
 
+  elements.elementNameInput.value = selectedNode.data("name");
+  if (selectedNode.data("grouped") === "true") {
+    elements.addToGroupNodeModalCheckbox.checked = true;
+    elements.groupNameInput.value = selectedNode.data("group_name");
+  }
+
   if (nodeType === "source") {
     fill = async (systemType) => {
+      sourcesData = {};
       let url = `${hostName}/rest/get/sources?type=${systemType}`;
       const data = await loadDataFromServer(url);
 
@@ -1361,6 +1415,7 @@ async function handleNodeClick(node) {
     };
   } else if (nodeType === "consumer") {
     fill = async (systemType) => {
+      consumersData = {};
       let url = `${hostName}/rest/get/consumers?type=${systemType}`;
       const data = await loadDataFromServer(url);
 
@@ -1383,16 +1438,18 @@ async function handleNodeClick(node) {
       });
     };
   } else if (nodeType === "connector") {
-    fill = async (systemType) => {};
-    elements.nodeModalList.style.display = "none";
-    elements.selectAllNodeModalCheckboxText.style.display = "none";
+    fill = async (systemType) => {
+      elements.nodeModalList.style.display = "none";
+      elements.selectAllNodeModalCheckboxText.style.display = "none";
+      elements.nodeModalList.innerHTML = "";
 
-    if (
-      elements.selectAllNodeModalCheckbox &&
-      elements.selectAllNodeModalCheckbox.parentNode
-    ) {
-      elements.selectAllNodeModalCheckbox.style.display = "none";
-    }
+      if (
+        elements.selectAllNodeModalCheckbox &&
+        elements.selectAllNodeModalCheckbox.parentNode
+      ) {
+        elements.selectAllNodeModalCheckbox.style.display = "none";
+      }
+    };
   }
 
   await fill(systemType);
@@ -1471,7 +1528,14 @@ async function handleEdgeClick(edge) {
   let isLocked = edge.locked();
   console.log(isLocked);
 
+  elements.elementNameInput.value = selectedEdge.data("name");
+  if (selectedEdge.data("grouped") === "true") {
+    elements.addToGroupNodeModalCheckbox.checked = true;
+    elements.groupNameInput.value = selectedEdge.data("group_name");
+  }
+
   const fill = async (systemType) => {
+    linesData = {};
     let url = `${hostName}/rest/get/lines?type=${systemType}`;
     const data = await loadDataFromServer(url);
 

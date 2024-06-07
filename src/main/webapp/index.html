@@ -3,13 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>МИЭС</title>
+    <title>
+      МИЭС - Инструмент для моделирования интегрированных энергетических систем.
+    </title>
     <script src="https://unpkg.com/cytoscape@3.19.0/dist/cytoscape.min.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=6" />
+    <link rel="stylesheet" href="./styles.css?v=15" />
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
   </head>
   <body>
@@ -229,14 +231,10 @@
       <div id="cy"></div>
       <section>
         <!-- Стартовое окно -->
-        <dialog id="startModal" class="modal">
+        <dialog id="startModal" class="modal start">
           <div class="modal_content">
             <div class="modal_start_btns">
-              <button
-                id="newModelBtn"
-                type="button"
-                class="btn btn-primary"
-              ></button>
+              <button id="newModelBtn" class="btn btn-primary"></button>
               <label
                 id="openFromDeviceBtn"
                 for="upload"
@@ -253,7 +251,6 @@
               <button
                 id="openChooseModelModal"
                 class="btn btn-primary"
-                type="button"
               ></button>
             </div>
           </div>
@@ -264,16 +261,28 @@
           <div class="modal_content">
             <h3 class="modal_title" id="newModelModalTitle"></h3>
             <input id="newModelNameInput" class="inp" />
-            <button id="createModelBtn" class="btn btn-primary"></button>
+            <div class="modal_btns">
+              <button
+                id="newModelModalCloseBtn"
+                class="btn btn-secondary"
+              ></button>
+              <button id="createModelBtn" class="btn btn-primary"></button>
+            </div>
           </div>
         </dialog>
 
         <!-- Недавние модели -->
-        <dialog id="chooseModelModal" class="modal">
+        <dialog id="chooseModelModal" class="modal choose">
           <div class="modal_content">
             <h3 class="modal_title" id="chooseModelModalTitle"></h3>
             <ul id="modelList" class="modal_choose_model_list"></ul>
-            <button id="openModelButton" class="btn btn-primary"></button>
+            <div class="modal_btns">
+              <button
+                id="chooseModelModalCloseBtn"
+                class="btn btn-secondary"
+              ></button>
+              <button id="openModelButton" class="btn btn-primary"></button>
+            </div>
           </div>
         </dialog>
 
@@ -282,9 +291,7 @@
           <div class="modal_content">
             <h3 class="modal_title" id="messageModalTitle">Сообщение</h3>
             <div class="modal_text" id="messageModalText"></div>
-            <button id="messageModalCloseBtn" class="btn btn-primary">
-              Закрыть
-            </button>
+            <button id="messageModalCloseBtn" class="btn btn-primary"></button>
           </div>
         </dialog>
 
@@ -314,6 +321,10 @@
                   <span id="waterNodeModalCheckboxText"></span>
                 </label>
 
+                <input id="elementNameInput" class="inp" />
+
+                <div class="line"></div>
+
                 <label class="checkbox">
                   <input type="checkbox" id="blockNodeModalCheckbox" />
                   <span id="blockNodeModalCheckboxText"></span>
@@ -323,7 +334,17 @@
                   <input type="checkbox" id="selectAllNodeModalCheckbox" />
                   <span id="selectAllNodeModalCheckboxText"></span>
                 </label>
+
+                <div class="line"></div>
+
+                <label class="checkbox">
+                  <input type="checkbox" id="addToGroupNodeModalCheckbox" />
+                  <span id="addToGroupNodeModalCheckboxText"></span>
+                </label>
+
+                <input id="groupNameInput" class="inp" />
               </div>
+
               <div
                 id="nodeModalList"
                 class="modal_node_block modal_node_block_inf list-column"
@@ -347,13 +368,32 @@
         <dialog id="resultModal" class="modal">
           <div class="modal_content">
             <h3 id="resultModalTitle" class="modal_title"></h3>
-            <div id="resultModalText" class="modal_text"></div>
+            <div class="modal_node_block list-row">
+              <label class="checkbox">
+                <input type="checkbox" id="linear" />
+                <span id="linearCheckboxText"></span>
+              </label>
+
+              <label class="checkbox">
+                <input type="checkbox" id="nonlinear" />
+                <span id="nonlinearCheckboxText"></span>
+              </label>
+            </div>
+
+            <div class="scrollable-area"></div>
             <div class="modal_node_btns">
               <button
                 id="resultModalCloseBtn"
                 type="button"
                 class="btn btn-secondary"
               ></button>
+              <button
+                id="resultModalCalculateBtn"
+                class="btn btn-primary"
+                type="button"
+              >
+                Рассчитать
+              </button>
               <button
                 id="resultModalSaveBtn"
                 class="btn btn-primary"
@@ -364,6 +404,6 @@
         </dialog>
       </section>
     </main>
-    <script src="index.js?v=54"></script>
+    <script src="index.js?v=56"></script>
   </body>
 </html>

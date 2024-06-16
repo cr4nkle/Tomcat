@@ -63,7 +63,7 @@ input {
 }
 
 .modal_choose_model_list {
-  max-height: 200px;
+  height: 200px;
   overflow-y: scroll;
   border: 1px solid rgb(202, 202, 202);
   border-radius: 5px;
@@ -266,11 +266,18 @@ input {
   min-width: 300px;
   min-height: 270;
 }
+.message {
+  min-width: 250px;
+  min-height: 143px;
+}
 
 .modal_content {
   display: flex;
   flex-direction: column;
   gap: 14px;
+}
+.modal_text {
+  text-align: center;
 }
 
 .modal_title {

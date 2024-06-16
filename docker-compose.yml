@@ -31,6 +31,8 @@ services:
       POSTGRES_PORT: 5432
     volumes:
       - ./dump/modelStorage.sql:/docker-entrypoint-initdb.d/modelStorage.sql
+    ports:
+      - "5452:5432"
 
   metaInfo:
     container_name: metaInfo

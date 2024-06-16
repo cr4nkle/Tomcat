@@ -98,6 +98,8 @@ const elements = {
   fuelNodeModalCheckbox: getElement("fuelNodeModalCheckbox"),
   heatNodeModalCheckbox: getElement("heatNodeModalCheckbox"),
   addToGroupNodeModalCheckbox: getElement("addToGroupNodeModalCheckbox"),
+  linearCheckbox: getElement("linearCheckbox"),
+  nonlinearCheckbox: getElement("nonlinearCheckbox"),
   scrollableArea: document.querySelector(".scrollable-area"),
 };
 
@@ -178,7 +180,7 @@ loadDataFromServer(localeUrl)
 
 elements.startModal.showModal();
 
-// Функция showMessage, адаптированная под механизм переключения слушателей
+// Функция showMessage
 const showMessage = (text) => {
   elements.modalText.textContent = text;
   elements.messageModal.showModal();
@@ -282,7 +284,7 @@ elements.openChooseModelModalToolbarBtn.addEventListener("click", async () => {
     elements.modelList.appendChild(listItemElement);
   });
 
-  //нажатие на список с моделями
+  // Нажатие на список с моделями
   elements.modelList.addEventListener("click", (event) => {
     const listItem = event.target.closest("li");
     if (!listItem) return;
@@ -290,7 +292,7 @@ elements.openChooseModelModalToolbarBtn.addEventListener("click", async () => {
     selectModel(listItem);
   });
 
-  //нажатие на кнопку для выбора модели
+  // Нажатие на кнопку для выбора модели
   elements.openModelBtn.addEventListener("click", async () => {
     if (isModelSave) {
       if (selectedModel) {
@@ -324,7 +326,7 @@ elements.openChooseModelModalToolbarBtn.addEventListener("click", async () => {
   });
 });
 
-//нажатие на кнопку открыть из бд со стартового окна
+// Нажатие на кнопку открыть из бд со стартового окна
 elements.openChooseModelModalBtn.addEventListener("click", async () => {
   elements.startModal.close();
   let url = `${hostName}/rest/get/models`;
@@ -349,7 +351,6 @@ elements.openChooseModelModalBtn.addEventListener("click", async () => {
     elements.modelList.appendChild(listItemElement);
   });
 
-  //нажатие на список с моделями
   elements.modelList.addEventListener("click", (event) => {
     const listItem = event.target.closest("li");
     if (!listItem) return;
@@ -357,7 +358,7 @@ elements.openChooseModelModalBtn.addEventListener("click", async () => {
     selectModel(listItem);
   });
 
-  //нажатие на кнопку для выбора модели
+  // Нажатие на кнопку для выбора модели
   elements.openModelBtn.addEventListener("click", async () => {
     if (isModelSave) {
       if (selectedModel) {
@@ -676,22 +677,70 @@ elements.moveToolbarBtn.addEventListener("click", () => {
   selectedEdge = null;
 });
 
-//переход к модели
+// Переход к модели
 elements.bullseyeToolbarBtn.addEventListener("click", () => {
   if (cy !== null) cy.fit();
 });
 
 //Операция расчет
-let result;
 
+// Перменная для хранения чекбоксов с выбором типа задачи
+const taskCheckboxes = [elements.linearCheckbox, elements.nonlinearCheckbox];
+
+// Нажатие в тулбаре кнопки расчета
 elements.calculateToolbarBtn.addEventListener("click", async () => {
+  removeAllListeners(); // Удаляем слушатели из списка
+  elements.linearCheckbox.checked = true; // Ставим линейную задачу по умолчанию
+  elements.nonlinearCheckbox.checked = false;
+  hideElements(elements.resultModalSaveBtn);
+  clearContent(elements.scrollableArea); // Чистим область с таблицей
+
+  // Переменная для отслеживания последнего выбранного чекбокса
+  let lastCheckedCheckbox = elements.linearCheckbox;
+
+  // Функция для обработки выбора чекбокса
+  const handleCheckboxChange = (checkbox) => {
+    if (lastCheckedCheckbox) {
+      // Снимаем выбор с предыдущего чекбокса
+      lastCheckedCheckbox.checked = false;
+    }
+    // Устанавливаем выбор на текущий чекбокс
+    checkbox.checked = true;
+    lastCheckedCheckbox = checkbox; // Обновляем последний выбранный чекбокс
+  };
+
+  const handleChange = async (checkbox) => {
+    switch (checkbox.id) {
+      case "linearCheckbox":
+        hideElements(elements.resultModalSaveBtn);
+        break;
+      case "nonlinearCheckbox":
+        showElements(elements.resultModalSaveBtn);
+        break;
+      default:
+        hideElements(elements.resultModalSaveBtn);
+    }
+    handleCheckboxChange(checkbox);
+  };
+
+  // Добавляем новые слушатели событий
+  taskCheckboxes.forEach((checkbox) => {
+    const key = `${checkbox.id}_handler`;
+    const boundFunction = handleChange.bind(null, checkbox);
+    boundFunctions[key] = boundFunction; // Сохраняем привязанную функцию
+    checkbox.addEventListener("change", boundFunction);
+  });
+
+  // Показываем окно
   elements.resultModal.showModal();
 });
 
+// Кнопка закрытия окна расчётов
 elements.resultModalCloseBtn.addEventListener("click", () => {
   elements.resultModal.close();
 });
 
+// Сохраняем данные для нелинейного расчета
 elements.resultModalSaveBtn.addEventListener("click", () => {
   downloadFile(result.data, modelName, "dat");
   downloadFile(result.model, modelName, "mod");
@@ -700,6 +749,10 @@ elements.resultModalSaveBtn.addEventListener("click", () => {
   elements.resultModal.close();
 });
 
+// Переменная для хранения результатов расчётов
+let result;
+
+// Кнопка выполнения расчёта
 elements.resultModalCalculateBtn.addEventListener("click", async () => {
   // Проверяем, что граф инициализирован
   if (cy !== null) {
@@ -708,30 +761,49 @@ elements.resultModalCalculateBtn.addEventListener("click", async () => {
       return element.style("display") !== "none";
     });
 
-    const url = `${hostName}/rest/post/calculate?type=nonlinear`;
-    // Получаем данные проблемы для расчета
-    // let problem = getLinearProblem(visibleElements);
-    let problem = getNonLinearProblem(visibleElements);
+    const selectedCheckbox = taskCheckboxes.find(
+      (checkbox) => checkbox.checked
+    );
 
-    // Преобразуем данные проблемы в JSON строку
-    let data = JSON.stringify(problem);
-    // Отправляем данные на сервер для расчета
-    result = await loadDataOnServer(url, data, "POST");
-    // Выводим результат расчета в консоль
-    console.log(result);
-
-    const table = createResultTable(result);
-
-    const objectiveText = document.createElement("p");
-    objectiveText.textContent = `Значение функции = ${result.objective}`;
-
-    // elements.resultModalText.innerHTML = "";
-    // elements.resultModalText.appendChild(objectiveText);
-    elements.scrollableArea.appendChild(table);
+    // Вызов функции по типу задачи
+    switch (selectedCheckbox.id) {
+      case "linearCheckbox":
+        handleCalculateProblem("linear", () =>
+          getLinearProblem(visibleElements)
+        );
+        break;
+      case "nonlinearCheckbox":
+        handleCalculateProblem("nonlinear", () =>
+          getNonLinearProblem(visibleElements)
+        );
+        break;
+      default:
+        break;
+    }
   }
 });
 
-//кнопка сохранить на окне резльтаты расчётов
+// Вспомогательная функция для отправки решения на сервер
+async function handleCalculateProblem(type, func) {
+  const url = `${hostName}/rest/post/calculate?type=${type}`;
+  // Получаем данные проблемы для расчета
+  let problem = func();
+  // Преобразуем данные проблемы в JSON строку
+  let data = JSON.stringify(problem);
+  // Отправляем данные на сервер для расчета
+  result = await loadDataOnServer(url, data, "POST");
+
+  clearContent(elements.scrollableArea);
+
+  const table = createResultTable(result);
+  const objectiveText = document.createElement("p");
+  objectiveText.textContent = `Значение функции = ${result.objective}`;
+
+  elements.scrollableArea.appendChild(objectiveText);
+  elements.scrollableArea.appendChild(table);
+}
+
+// Функция для скачивания файлов с нелинейной постановкой
 function downloadFile(data, modelName, extension) {
   var blob = new Blob([data], { type: "application/octet-stream" });
   var url = URL.createObjectURL(blob);
@@ -892,7 +964,7 @@ elements.nodeModalCloseBtn.addEventListener("click", () => {
   elements.blockNodeModalCheckbox.checked = false;
 });
 
-//кнопка закрыть на окне информация об оборудовании
+// Кнопка сохранить на окне информация об оборудовании
 elements.nodeModalSaveBtn.addEventListener("click", () => {
   let systemType = getSystemTypeFromCheckboxes();
 
@@ -911,7 +983,7 @@ elements.nodeModalSaveBtn.addEventListener("click", () => {
         if (elements.groupNameInput.value.trim() !== "") {
           selectedNode.data("group_name", elements.groupNameInput.value);
         } else {
-          showMessage("Вы не вввели наименование!!");
+          showMessage("Вы не вввели наименование!!"); // С жтим ещё поработать
           return;
         }
       } else {
@@ -942,13 +1014,14 @@ elements.nodeModalSaveBtn.addEventListener("click", () => {
     else if (selectedEdge !== null) {
       saveSelectedData(selectedEdge, linesData);
       selectedEdge.data("system_type", systemType);
-      selectedEdge.data("name", elements.elementNameInput.value);
-      selectedEdge.locked(elements.blockNodeModalCheckbox.checked);
+
+      if (elements.elementNameInput.value.trim() !== "")
+        selectedEdge.data("name", elements.elementNameInput.value);
+
+      if (elements.groupNameInput.value.trim() !== "")
+        selectedEdge.data("length", elements.groupNameInput.value);
     }
   }
-
-  // var ids = findSystemTypes(cy);
-  // setCheckedByIds(ids, elements.hideCheckboxes);
 
   elements.nodeModal.close();
   elements.selectAllNodeModalCheckbox.checked = false;
@@ -958,6 +1031,7 @@ elements.nodeModalSaveBtn.addEventListener("click", () => {
   elements.addToGroupNodeModalCheckbox.checked = false;
 });
 
+// Функция для поиска типа системы по выбранному чекбоксу
 function getSystemTypeFromCheckboxes() {
   const systemTypesCheckboxes = [
     elements.powerNodeModalCheckbox,
@@ -970,6 +1044,7 @@ function getSystemTypeFromCheckboxes() {
     (checkbox) => checkbox.checked
   );
 
+  // Сбрасываем все чекбоксы
   setCheckedSystemTypesCheckboxes("", systemTypesCheckboxes);
 
   switch (selectedCheckbox.id) {
@@ -989,17 +1064,37 @@ function getSystemTypeFromCheckboxes() {
 function saveSelectedData(selectedElement, objectsData) {
   const checkboxes = document.querySelectorAll(
     '.modal_node_item input[type="checkbox"]'
-  ); //чекбоксы с выбора оборудования
+  ); // Все чекбоксы с выбора оборудования
+  // Получаем только четные чекбоксы (чекбоксы с надписью Выбрать)
+  const evenCheckboxes = Array.from(checkboxes).filter(
+    (checkbox, index) => index % 2 === 0
+  );
+  // Получаем только нечётные чекбоксы (с надписью Установлено)
+  const oddCheckboxes = Array.from(checkboxes).filter(
+    (checkbox, index) => index % 2 !== 0
+  );
+
   // Фильтруем выбранные чекбоксы
-  const selectedCheckboxes = Array.from(checkboxes).filter(
+  const evenSelectedCheckboxes = evenCheckboxes.filter(
     (checkbox) => checkbox.checked
   );
-  // Получаем идентификаторы выбранных чекбоксов
-  var selectedIds = getSelectedIds(selectedCheckboxes);
+  // Фильтруем выбранные чекбоксы
+  const oddSelectedCheckboxes = oddCheckboxes.filter(
+    (checkbox) => checkbox.checked
+  );
+  // Получаем идентификаторы выбранных чётных чекбоксов
+  var evenSelectedIds = getSelectedIds(evenSelectedCheckboxes);
   // Получаем данные оборудования по идентификаторам
-  const selectedData = selectedIds.map((id) => {
-    return objectsData[id];
+  const selectedData = evenSelectedIds.map((id) => {
+    // Создаем копию объекта данных, чтобы не мутировать оригинал
+    let dataCopy = { ...objectsData[id] };
+    // Устанавливаем свойство installed в соответствии со свойством checked у oddSelectedCheckboxes
+    dataCopy.installed = oddSelectedCheckboxes.some(
+      (checkbox) => checkbox.value === id && checkbox.checked
+    );
+    return dataCopy;
   });
+
   // Получаем текущие данные
   var elementData = selectedElement.data();
 
@@ -1033,8 +1128,15 @@ elements.selectAllNodeModalCheckbox.addEventListener("change", function () {
     '.modal_node_item input[type="checkbox"]'
   );
 
-  checkboxes.forEach((checkbox) => {
-    checkbox.checked = this.checked;
+  checkboxes.forEach((checkbox, index) => {
+    // Проверяем, является ли индекс нечетным
+    if (index % 2 !== 0) {
+      // Если индекс нечетный, делаем чекбокс противоположным значению текущего
+      checkbox.checked = false;
+    } else {
+      // Если индекс четный, оставляем значение чекбокса без изменений
+      checkbox.checked = this.checked;
+    }
   });
 });
 
@@ -1276,7 +1378,7 @@ function createNodeElementLineItem(obj) {
     <p>Наименование: ${obj.name}</p>
     <p>Пропускная способность: ${obj.throughput}</p>
     <p>Сопротивление: ${obj.resistance}</p>
-    <p>Цена: ${obj.cost}</p>
+    <p>Затраты: ${obj.cost}</p>
     <label><input type="checkbox" value="${obj.id}" /> Выбрать</label>
     <label><input type="checkbox" value="${obj.id}" /> Установлено</label>    
   `;
@@ -1295,7 +1397,7 @@ function createNodeElementSourceItem(obj) {
     <p>Затраты: ${obj.cost}</p>
     <p>Эффективность: ${obj.efficiency}</p>
     <label><input type="checkbox" value="${obj.id}" /> Выбрать</label>
-    <label><input type="checkbox" value="${obj.id}" /> Установлено</label>  
+    <label><input type="checkbox" value="${obj.id}"  /> Установлено</label>  
   `;
 
   return element;
@@ -1308,7 +1410,7 @@ function createNodeElementConsumerItem(obj) {
     <p>Наименование: ${obj.name}</p>
     <p>Нагрузка: ${obj.load}</p>
     <label><input type="checkbox" value="${obj.id}" /> Выбрать</label>
-    <label><input type="checkbox" value="${obj.id}" /> Установлено</label>  
+    <label><input type="checkbox" value="${obj.id}"  /> Установлено</label>  
   `;
 
   return element;
@@ -1330,7 +1432,7 @@ function initializeGraphMethods(cy) {
   setCheckedByIds(ids, elements.hideCheckboxes);
 
   // Обработчик события клика по узлу
-  cy.on("click", "node", async function (event) {
+  cy.on("tap", "node", async function (event) {
     console.log("node click");
     var node = event.target;
     var id = node.data("id");
@@ -1349,7 +1451,7 @@ function initializeGraphMethods(cy) {
   });
 
   // Обработчик события клика по ребру
-  cy.on("click", "edge", async function (event) {
+  cy.on("tap", "edge", async function (event) {
     console.log("edge click");
     var edge = event.target;
 
@@ -1363,7 +1465,7 @@ function initializeGraphMethods(cy) {
   });
 
   // Обработчик события клика по области графа
-  cy.on("click", function (event) {
+  cy.on("tap", function (event) {
     if (event && event.position && addNodeOn) {
       var pos = event.position;
       addNodeToGraph(pos);
@@ -1371,100 +1473,172 @@ function initializeGraphMethods(cy) {
   });
 }
 
+// Перменная для хранения слушателя, который мы можем удалить
+let addToGroupNodeModalCheckboxChangeListener = null;
+
 // Функция для обработки клика по узлу
 async function handleNodeClick(node) {
-  // let equipment = node.data("equipment");
   let systemType = node.data("system_type");
   let nodeType = node.data("node_type");
   let isLocked = node.locked();
-  let fill;
+  let fill = null;
 
+  increaseMaxHeight("278px");
   elements.elementNameInput.value = selectedNode.data("name");
+  elements.groupNameInput.placeholder = "Название группы";
+
   if (selectedNode.data("grouped") === "true") {
+    elements.groupNameInput.disabled = false;
     elements.addToGroupNodeModalCheckbox.checked = true;
     elements.groupNameInput.value = selectedNode.data("group_name");
+  } else {
+    elements.groupNameInput.disabled = true;
+    elements.addToGroupNodeModalCheckbox.checked = false;
+    elements.groupNameInput.value = "";
   }
 
-  if (nodeType === "source") {
+  // Удаление старого слушателя, если он существует
+  if (addToGroupNodeModalCheckboxChangeListener) {
+    elements.addToGroupNodeModalCheckbox.removeEventListener(
+      "change",
+      addToGroupNodeModalCheckboxChangeListener
+    );
+  }
+
+  // Добавление нового слушателя
+  addToGroupNodeModalCheckboxChangeListener = () => {
+    if (elements.addToGroupNodeModalCheckbox.checked) {
+      elements.groupNameInput.disabled = false;
+    } else {
+      elements.groupNameInput.disabled = true;
+    }
+  };
+
+  // Назначаем слушатель
+  elements.addToGroupNodeModalCheckbox.addEventListener(
+    "change",
+    addToGroupNodeModalCheckboxChangeListener
+  );
+
+  removeAllListeners(); // Вызываем функцию для удаления слушателей после добавления новых
+
+  // Определение функции fill в зависимости от nodeType
+  if (nodeType === "source" || nodeType === "consumer") {
     fill = async (systemType) => {
-      sourcesData = {};
-      let url = `${hostName}/rest/get/sources?type=${systemType}`;
+      let url = `${hostName}/rest/get/${nodeType}s?type=${systemType}`;
       const data = await loadDataFromServer(url);
 
       // Показать элементы
-      elements.nodeModalList.style.display = "";
-      elements.selectAllNodeModalCheckboxText.style.display = "";
-      elements.selectAllNodeModalCheckbox.style.display = "";
+      showElements(
+        elements.nodeModalList,
+        elements.selectAllNodeModalCheckboxText,
+        elements.selectAllNodeModalCheckbox,
+        elements.blockNodeModalCheckbox,
+        elements.blockNodeModalCheckboxText,
+        elements.addToGroupNodeModalCheckbox,
+        elements.addToGroupNodeModalCheckboxText
+      );
 
-      elements.nodeModalList.innerHTML = "";
-
-      data.forEach((item) => {
-        const nodeElement = createNodeElementSourceItem(item);
-        nodeModalList.appendChild(nodeElement);
-        sourcesData[item.id] = {
-          id: item.id,
-          name: item.name,
-          max_gen: item.max_gen,
-          min_gen: item.min_gen,
-          price: item.price,
-          cost: item.cost,
-          efficiency: item.efficiency,
-          installed: false,
-        };
-      });
-    };
-  } else if (nodeType === "consumer") {
-    fill = async (systemType) => {
-      consumersData = {};
-      let url = `${hostName}/rest/get/consumers?type=${systemType}`;
-      const data = await loadDataFromServer(url);
-
-      // Показать элементы
-      elements.nodeModalList.style.display = "";
-      elements.selectAllNodeModalCheckboxText.style.display = "";
-      elements.selectAllNodeModalCheckbox.style.display = "";
-
-      elements.nodeModalList.innerHTML = "";
+      // Очистить содержимое
+      clearContent(elements.nodeModalList);
 
       data.forEach((item) => {
-        const nodeElement = createNodeElementConsumerItem(item);
-        nodeModalList.appendChild(nodeElement);
-        consumersData[item.id] = {
-          id: item.id,
-          name: item.name,
-          load: item.load,
-          installed: false,
-        };
+        // Заполнение данных
+        if (nodeType === "source") {
+          const nodeElement = createNodeElementSourceItem(item);
+          elements.nodeModalList.appendChild(nodeElement);
+
+          sourcesData[item.id] = {
+            id: item.id,
+            name: item.name,
+            max_gen: item.max_gen,
+            min_gen: item.min_gen,
+            price: item.price,
+            cost: item.cost,
+            efficiency: item.efficiency,
+            installed: false,
+          };
+        } else {
+          const nodeElement = createNodeElementConsumerItem(item);
+          elements.nodeModalList.appendChild(nodeElement);
+
+          consumersData[item.id] = {
+            id: item.id,
+            name: item.name,
+            load: item.load,
+            installed: false,
+          };
+        }
       });
     };
   } else if (nodeType === "connector") {
-    fill = async (systemType) => {
-      elements.nodeModalList.style.display = "none";
-      elements.selectAllNodeModalCheckboxText.style.display = "none";
-      elements.nodeModalList.innerHTML = "";
+    fill = async () => {
+      hideElements(
+        elements.nodeModalList,
+        elements.selectAllNodeModalCheckboxText,
+        elements.selectAllNodeModalCheckbox
+      );
 
-      if (
-        elements.selectAllNodeModalCheckbox &&
-        elements.selectAllNodeModalCheckbox.parentNode
-      ) {
-        elements.selectAllNodeModalCheckbox.style.display = "none";
-      }
+      showElements(
+        elements.blockNodeModalCheckbox,
+        elements.blockNodeModalCheckboxText,
+        elements.addToGroupNodeModalCheckbox,
+        elements.addToGroupNodeModalCheckboxText
+      );
+
+      // Очистить содержимое
+      clearContent(elements.nodeModalList);
     };
   }
 
+  // Вызов функции fill
   await fill(systemType);
+  handleReloadData(fill, node);
   elements.selectAllNodeModalCheckbox.disabled = false;
   elements.blockNodeModalCheckbox.checked = isLocked;
   elements.nodeModal.showModal();
-  handleReloadData(fill, node);
 }
 
-function handleReloadData(fill, element) {
+// Общие функции для показа и очистки элементов
+function showElements(...elements) {
+  elements.forEach((el) => (el.style.display = ""));
+}
+
+function clearContent(element) {
+  element.innerHTML = "";
+}
+
+function hideElements(...elements) {
+  elements.forEach((el) => (el.style.display = "none"));
+}
+
+function increaseMaxHeight(height) {
+  var modalNodeBlockInf = document.querySelector(".modal_node_block_inf");
+  modalNodeBlockInf.style.maxHeight = height;
+}
+
+// Перменная для хранения слушателей, которые мы можем удалить
+const boundFunctions = {};
+
+// Функция для удаления слушателей событий
+function removeAllListeners() {
+  Object.keys(boundFunctions).forEach((key) => {
+    const checkboxId = key.split("_")[0];
+    const checkbox = document.getElementById(checkboxId);
+    if (checkbox) {
+      checkbox.removeEventListener("change", boundFunctions[key]);
+      delete boundFunctions[key]; // Удаляем привязанную функцию из объекта
+    }
+  });
+}
+
+// Обработчик смены типа системы
+async function handleReloadData(func, element) {
   let systemType = element.data("system_type");
   let equipment = element.data("equipment");
 
   const itemCheckbox = document.querySelectorAll(
-    ".modal_node_item input[type=checkbox]"
+    '.modal_node_item input[type="checkbox"]'
   );
 
   updateCheckboxesState(equipment, itemCheckbox);
@@ -1487,63 +1661,85 @@ function handleReloadData(fill, element) {
       // Снимаем выбор с предыдущего чекбокса
       lastCheckedCheckbox.checked = false;
     }
-
     // Устанавливаем выбор на текущий чекбокс
     checkbox.checked = true;
     lastCheckedCheckbox = checkbox; // Обновляем последний выбранный чекбокс
   };
 
-  // Пример использования для каждого чекбокса
+  const handleChange = async (checkbox) => {
+    switch (checkbox.id) {
+      case "powerNodeModalCheckbox":
+        systemType = "power";
+        break;
+      case "heatNodeModalCheckbox":
+        systemType = "heat";
+        break;
+      case "fuelNodeModalCheckbox":
+        systemType = "fuel";
+        break;
+      case "waterNodeModalCheckbox":
+        systemType = "cold";
+        break;
+      default:
+        systemType = "other";
+    }
+    handleCheckboxChange(checkbox);
+    await func(systemType);
+    elements.blockNodeModalCheckbox.checked = false;
+    elements.selectAllNodeModalCheckbox.checked = false;
+    elements.selectAllNodeModalCheckbox.disabled = false;
+    elements.addToGroupNodeModalCheckbox.checked = false;
+    elements.elementNameInput.value = "";
+    elements.groupNameInput.value = "";
+    elements.groupNameInput.disabled = true;
+    element.unlock();
+  };
+
+  // Добавляем новые слушатели событий
   systemTypesCheckboxes.forEach((checkbox) => {
-    checkbox.addEventListener("change", async () => {
-      switch (checkbox.id) {
-        case "powerNodeModalCheckbox":
-          systemType = "power";
-          break;
-        case "heatNodeModalCheckbox":
-          systemType = "heat";
-          break;
-        case "fuelNodeModalCheckbox":
-          systemType = "fuel";
-          break;
-        case "waterNodeModalCheckbox":
-          systemType = "cold";
-          break;
-        default:
-          systemType = "other";
-      }
-      handleCheckboxChange(checkbox);
-      await fill(systemType);
-      elements.blockNodeModalCheckbox.checked = false;
-      elements.selectAllNodeModalCheckbox.disabled = false;
-      element.unlock();
-      // updateCheckboxesState(equipment, itemCheckbox);
-    });
+    const key = `${checkbox.id}_handler`;
+    const boundFunction = handleChange.bind(null, checkbox);
+    boundFunctions[key] = boundFunction; // Сохраняем привязанную функцию
+    checkbox.addEventListener("change", boundFunction);
   });
 }
 
 // Функция для обработки клика по ребру
 async function handleEdgeClick(edge) {
   let systemType = edge.data("system_type");
-  let isLocked = edge.locked();
-  console.log(isLocked);
 
+  increaseMaxHeight("239px");
   elements.elementNameInput.value = selectedEdge.data("name");
-  if (selectedEdge.data("grouped") === "true") {
-    elements.addToGroupNodeModalCheckbox.checked = true;
-    elements.groupNameInput.value = selectedEdge.data("group_name");
-  }
+  elements.groupNameInput.placeholder = "Длина участка";
+  elements.groupNameInput.disabled = false;
+  elements.groupNameInput.value = edge.data("length");
+  removeAllListeners();
 
   const fill = async (systemType) => {
-    linesData = {};
     let url = `${hostName}/rest/get/lines?type=${systemType}`;
     const data = await loadDataFromServer(url);
 
-    elements.nodeModalList.innerHTML = "";
+    elements.groupNameInput.disabled = false;
+    // Скрываем элементы заблокировать и в группе
+    hideElements(
+      elements.blockNodeModalCheckbox,
+      elements.blockNodeModalCheckboxText,
+      elements.addToGroupNodeModalCheckbox,
+      elements.addToGroupNodeModalCheckboxText
+    );
+    // Показать элементы
+    showElements(
+      elements.nodeModalList,
+      elements.selectAllNodeModalCheckboxText,
+      elements.selectAllNodeModalCheckbox
+    );
+    // Очистить содержимое
+    clearContent(elements.nodeModalList);
 
     data.forEach((item) => {
       const nodeElement = createNodeElementLineItem(item);
       nodeModalList.appendChild(nodeElement);
+
       linesData[item.id] = {
         id: item.id,
         name: item.name,
@@ -1561,14 +1757,29 @@ async function handleEdgeClick(edge) {
   elements.selectAllNodeModalCheckbox.disabled = false;
 }
 
-// Функция для обновления состояния чекбоксов
+// Функция для обновления состояния чекбоксов в окне с оборудованием
 function updateCheckboxesState(equipment, checkboxes) {
+  // Получаем только чётные чекбоксы (с надписью Выбрать)
+  const evenCheckboxes = Array.from(checkboxes).filter(
+    (checkbox, index) => index % 2 === 0
+  );
+  // Получаем только нечётные чекбоксы (с надписью Установлено)
+  const oddCheckboxes = Array.from(checkboxes).filter(
+    (checkbox, index) => index % 2 !== 0
+  );
   equipment.forEach((element) => {
-    const checkbox = Array.from(checkboxes).find(
+    const evenCheckbox = evenCheckboxes.find(
       (cb) => cb.value === `${element.id}`
     );
-    if (checkbox) {
-      checkbox.checked = true;
+    if (evenCheckbox) {
+      evenCheckbox.checked = true;
+    }
+
+    const oddCheckbox = oddCheckboxes.find(
+      (cb) => cb.value === `${element.id}` && element.installed
+    );
+    if (oddCheckbox) {
+      oddCheckbox.checked = true;
     }
   });
 }
@@ -1637,7 +1848,7 @@ function addEdgeToGraph(id) {
             target: secondNodeSelected,
             system_type: "heat",
             name: edgeId,
-            length: 20,
+            length: 1,
             equipment: [
               {
                 id: 0,
@@ -1833,11 +2044,7 @@ function getLinearProblem(visibleElements) {
   // Добавляем специальные идентификаторы для узла и ребра
   data["node_id"].push("lim");
   data["edge_id"].push("sign", "lim");
-  // Выводим данные для отладки
-  console.log(data["node_id"]);
-  console.log(data["edge_id"]);
-  console.log(data);
-  // Возвращаем собранные данные о проблеме
+
   return data;
 }
 

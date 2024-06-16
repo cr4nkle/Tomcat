@@ -96,7 +96,7 @@ public class NonLinearStatement {
             max.add((double) e.getThroughput());
 
             if (!e.isInstalled()) {
-                goal.add((double) e.getCost());
+                goal.add((double) e.getCost() * e.getLength());
                 type.add(true);
                 count.getAndIncrement();
             } else {
